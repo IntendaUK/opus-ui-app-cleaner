@@ -1,5 +1,6 @@
 # All run artifacts (reports, backups, trash, baseline) — cleared by the next
-# --apply run (or npm run revert). output/deleted-files and output/*-backup
+# --apply run (or npm run revert). output/
+*.logdeleted-files and output/*-backup
 # are the undo record for the most recent run.
 output/
 
