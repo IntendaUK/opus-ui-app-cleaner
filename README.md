@@ -80,12 +80,13 @@ convergence). Without `--apply` everything runs in report-only mode.
 --maxPasses=<n>       Convergence pass cap (default 6)
 --skip=<names>        Skip named steps (see table above)
 --entrypoints=<file>  Menu dataset file (see entrypoints.sample.txt)
---workspace=<dir>     Workspace root (default: two levels up from this folder)
+--app=<dir>           App root (default: appPath from ./config.json)
+--workspace=<dir>     Legacy: app assumed at <workspace>/legoz
 ```
 
 ## Outputs and undo
 
-- Every step writes a `*-report.json` next to the scripts documenting exactly
+- Every step writes a `*-report.json` into the tool root documenting exactly
   what changed; the summary prints total passes and workspace size before/after.
 - `deleted-files/` and the `*-backup/` folders are the undo record for the
   latest run. They survive until the **next** `--apply` run clears them —
