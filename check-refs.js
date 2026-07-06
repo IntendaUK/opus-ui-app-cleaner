@@ -22,6 +22,7 @@
 const fs = require('fs');
 const path = require('path');
 const { createScanner } = require('./lib/scan-core');
+const { resolveAppDir } = require('./lib/app-config');
 const { defaultEntrypointsPath } = require('./lib/trait-refs');
 const { parseArgs } = require('./lib/json-doc');
 
@@ -34,7 +35,7 @@ Usage: node check-refs.js [options]
 Options:
   --update-baseline      Write all current issues to check-refs-baseline.json
   --strict               Ignore the baseline; any issue fails
-  --workspace=<dir>      Workspace root (default: two levels up from this script)
+  --app=<dir>            App root (default: appPath from ../config.json)
   --entrypoints=<file>   Menu dataset (default: entrypoints.txt / sample)
   --field=<name>         Field for JSON entrypoints files
   --help                 Show this help
@@ -44,7 +45,7 @@ Options:
 
 const BASELINE_PATH = path.join(__dirname, 'check-refs-baseline.json');
 
-const scanner = createScanner({ workspace: args.workspace || path.join(__dirname, '..', '..') });
+const scanner = createScanner({ appDir: resolveAppDir(args) });
 const { files, registerSrcFiles, scanFile, processRef, parseEntrypointsFile } = scanner;
 
 registerSrcFiles();

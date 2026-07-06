@@ -48,6 +48,7 @@ const path = require('path');
 const crypto = require('crypto');
 const { execFileSync } = require('child_process');
 const { parseArgs } = require('./lib/json-doc');
+const { resolveAppDir, readEnsembles } = require('./lib/app-config');
 
 const args = parseArgs();
 
@@ -64,7 +65,8 @@ Options:
                         unused, delete, acceptprps, collapse, dedupe, traitprps,
                         merge, srcactions, check, redundant, themekeys
   --entrypoints=<file>  Menu dataset passed to every step that takes one
-  --workspace=<dir>     Workspace root (default: two levels up from this script)
+  --app=<dir>           App root (default: appPath from ./config.json)
+  --workspace=<dir>     Legacy: app assumed at <workspace>/legoz
   --help                Show this help
 `);
 	process.exit(0);
@@ -78,6 +80,8 @@ if (args.entrypoints)
 	passthrough.push(`--entrypoints=${args.entrypoints}`);
 if (args.workspace)
 	passthrough.push(`--workspace=${args.workspace}`);
+if (args.app)
+	passthrough.push(`--app=${args.app}`);
 
 //Each step: name, script, args for dry mode, args for apply mode (null = skip in
 // that mode), and whether a non-zero exit should stop the suite.
@@ -172,7 +176,9 @@ const steps = [
 //Total character size of all workspace sources the cleanup touches (ensemble +
 // legoz/app .json/.js) — measured before and after so the summary shows the
 // net saving of the whole run.
-const WORKSPACE_ROOT = path.resolve(args.workspace || path.join(__dirname, '..', '..'));
+const APP_ROOT = resolveAppDir(args);
+//Every registered ensemble + the app's app/ folder — the cleanup's whole world.
+const CLEANUP_ROOTS = [...readEnsembles(APP_ROOT).map(e => e.root), path.join(APP_ROOT, 'app')];
 const measureWorkspaceChars = () => {
 	let chars = 0;
 	const walk = dir => {
@@ -192,11 +198,7 @@ const measureWorkspaceChars = () => {
 				chars += fs.statSync(p).size;
 		}
 	};
-	for (const e of fs.readdirSync(WORKSPACE_ROOT, { withFileTypes: true })) {
-		if (e.isDirectory() && e.name.startsWith('l2_'))
-			walk(path.join(WORKSPACE_ROOT, e.name));
-	}
-	walk(path.join(WORKSPACE_ROOT, 'legoz', 'app'));
+	CLEANUP_ROOTS.forEach(walk);
 	return chars;
 };
 
@@ -247,11 +249,7 @@ const workspaceHash = () => {
 			}
 		}
 	};
-	for (const e of fs.readdirSync(WORKSPACE_ROOT, { withFileTypes: true })) {
-		if (e.isDirectory() && e.name.startsWith('l2_'))
-			walk(path.join(WORKSPACE_ROOT, e.name));
-	}
-	walk(path.join(WORKSPACE_ROOT, 'legoz', 'app'));
+	CLEANUP_ROOTS.forEach(walk);
 	return h.digest('hex');
 };
 
@@ -341,7 +339,7 @@ console.log(`\n  Total: ${Math.round((Date.now() - startedAt) / 1000)}s`);
 const charsAfter = measureWorkspaceChars();
 const charsSaved = charsBefore - charsAfter;
 const savedPct = charsBefore ? (charsSaved / charsBefore * 100).toFixed(1) : '0.0';
-console.log(`\n  Workspace size (l2_* + legoz/app, .json+.js): ${charsBefore.toLocaleString('en-US')} chars before, ${charsAfter.toLocaleString('en-US')} after (${charsSaved >= 0 ? 'saved' : 'grew'} ${Math.abs(charsSaved).toLocaleString('en-US')} = ${Math.abs(Number(savedPct))}%)`);
+console.log(`\n  Workspace size (ensembles + app, .json+.js): ${charsBefore.toLocaleString('en-US')} chars before, ${charsAfter.toLocaleString('en-US')} after (${charsSaved >= 0 ? 'saved' : 'grew'} ${Math.abs(charsSaved).toLocaleString('en-US')} = ${Math.abs(Number(savedPct))}%)`);
 
 if (APPLY) {
 	console.log(`

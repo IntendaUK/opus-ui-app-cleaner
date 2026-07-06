@@ -30,6 +30,7 @@ const fs = require('fs');
 const path = require('path');
 const { spawnSync } = require('child_process');
 const { createScanner } = require('./lib/scan-core');
+const { resolveAppDir } = require('./lib/app-config');
 const { generateScript } = require('./lib/script-codegen');
 const { loadDoc, saveDoc, parseArgs } = require('./lib/json-doc');
 
@@ -44,7 +45,7 @@ Options:
   --only=<substr>       Only process JSON files whose path contains <substr>
   --minNative=<pct>     Skip scripts whose native ratio is below <pct> (0-100,
                         default 0 — convert everything, delegation included)
-  --workspace=<dir>     Workspace root (default: two levels up from this script)
+  --app=<dir>            App root (default: appPath from ../config.json)
   --out=<dir>           Report output directory (default: this folder)
   --help                Show this help
 `);
@@ -57,7 +58,7 @@ const MIN_NATIVE = Number(args.minNative ?? 0);
 const OUT_DIR = path.resolve(args.out || __dirname);
 const BACKUP = path.join(__dirname, 'convert-backup');
 
-const scanner = createScanner({ workspace: args.workspace || path.join(__dirname, '..', '..') });
+const scanner = createScanner({ appDir: resolveAppDir(args) });
 const { files } = scanner;
 
 //Total character size of all ensemble .json/.js sources — measured before and
@@ -360,15 +361,21 @@ if (APPLY) {
 	// imports dangling (earlier conversions may already reference it even when
 	// this run converts nothing new).
 	{
-		const helperSrc = path.join(__dirname, 'assets', 'scriptHelpers-net.js');
-		const helperDest = path.join(scanner.WORKSPACE, 'l2_util', 'scriptHelpers', 'net.js');
-		const srcContent = fs.readFileSync(helperSrc, 'utf-8');
-		const current = fs.existsSync(helperDest) ? fs.readFileSync(helperDest, 'utf-8') : null;
-		if (current !== srcContent) {
-			fs.mkdirSync(path.dirname(helperDest), { recursive: true });
-			fs.writeFileSync(helperDest, srcContent);
-			console.log(`Deposited network helper: ${path.relative(scanner.WORKSPACE, helperDest)}`);
-		}
+		//Generated network calls import '@l2_util/scriptHelpers/net' — resolve the
+		// destination through the ensemble registry (roots can live anywhere).
+		const utilEnsemble = scanner.ensemblesByName.get('l2_util');
+		if (utilEnsemble) {
+			const helperSrc = path.join(__dirname, 'assets', 'scriptHelpers-net.js');
+			const helperDest = path.join(utilEnsemble.root, 'scriptHelpers', 'net.js');
+			const srcContent = fs.readFileSync(helperSrc, 'utf-8');
+			const current = fs.existsSync(helperDest) ? fs.readFileSync(helperDest, 'utf-8') : null;
+			if (current !== srcContent) {
+				fs.mkdirSync(path.dirname(helperDest), { recursive: true });
+				fs.writeFileSync(helperDest, srcContent);
+				console.log('Deposited network helper: l2_util/scriptHelpers/net.js');
+			}
+		} else
+			console.warn('No l2_util ensemble registered — network-action scripts import @l2_util/scriptHelpers/net and need one.');
 	}
 
 	for (const w of pendingWrites) {

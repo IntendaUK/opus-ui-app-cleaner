@@ -18,6 +18,7 @@
 const fs = require('fs');
 const path = require('path');
 const { createScanner } = require('./lib/scan-core');
+const { resolveAppDir } = require('./lib/app-config');
 const { loadDoc, saveDoc, parseArgs } = require('./lib/json-doc');
 
 const args = parseArgs();
@@ -28,7 +29,7 @@ Usage: node unused-traitprps.js [options]
 
 Options:
   --apply               Actually strip dead traitPrps keys (default: dry-run)
-  --workspace=<dir>     Workspace root (default: two levels up from this script)
+  --app=<dir>            App root (default: appPath from ../config.json)
   --out=<dir>           Report output directory (default: this folder)
   --help                Show this help
 `);
@@ -38,7 +39,7 @@ Options:
 const APPLY = !!args.apply;
 const OUT_DIR = path.resolve(args.out || __dirname);
 
-const scanner = createScanner({ workspace: args.workspace || path.join(__dirname, '..', '..') });
+const scanner = createScanner({ appDir: resolveAppDir(args) });
 const { files, key, ensemblesByName } = scanner;
 
 const norm = p => path.resolve(p).replace(/\\/g, '/');

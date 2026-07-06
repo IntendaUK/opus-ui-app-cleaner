@@ -53,13 +53,15 @@ Options:
   --file=<substr>        Only touch files whose workspace path contains <substr>
                          (case-insensitive)
   --undo                 Restore every prop in the manifest, then clear it
-  --workspace=<dir>      Workspace root (default: two levels up from this script)
+  --app=<dir>            App root (default: appPath from ../config.json)
   --help                 Show this help
 `);
 	process.exit(0);
 }
 
-const WORKSPACE = path.resolve(args.workspace || path.join(__dirname, '..', '..'));
+const { resolveAppDir, makeRelResolver } = require('./lib/app-config');
+const APP_DIR = resolveAppDir(args);
+const absFromRel = makeRelResolver(APP_DIR);
 const MANIFEST_PATH = path.join(__dirname, 'deleted-accept-prps-manifest.json');
 const dryRun = !!args['dry-run'];
 
@@ -85,7 +87,7 @@ if (args.undo) {
 	//Newest runs first so repeated delete/undo cycles unwind cleanly.
 	for (const run of [...(manifest.runs ?? [])].reverse()) {
 		for (const entry of run.entries) {
-			const absPath = path.join(WORKSPACE, entry.file);
+			const absPath = absFromRel(entry.file);
 
 			let raw;
 			try {
@@ -145,7 +147,7 @@ if (args.undo) {
 const { createScanner } = require('./lib/scan-core');
 const { analyzeAcceptPrps } = require('./lib/accept-prps-core');
 
-const scanner = createScanner({ workspace: WORKSPACE });
+const scanner = createScanner({ appDir: APP_DIR });
 const { traits } = analyzeAcceptPrps(scanner);
 
 const fileFilter = args.file ? String(args.file).toLowerCase() : null;

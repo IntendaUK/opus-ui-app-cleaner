@@ -22,6 +22,7 @@
 const fs = require('fs');
 const path = require('path');
 const { createScanner } = require('./lib/scan-core');
+const { resolveAppDir } = require('./lib/app-config');
 const { loadDoc, parseArgs } = require('./lib/json-doc');
 
 const args = parseArgs();
@@ -32,7 +33,7 @@ Usage: node unused-theme-keys.js [options]
 
 Options:
   --print               Print every unused key (default: first 15 per theme file)
-  --workspace=<dir>     Workspace root (default: two levels up from this script)
+  --app=<dir>            App root (default: appPath from ../config.json)
   --out=<dir>           Report output directory (default: this folder)
   --help                Show this help
 `);
@@ -41,7 +42,7 @@ Options:
 
 const OUT_DIR = path.resolve(args.out || __dirname);
 
-const scanner = createScanner({ workspace: args.workspace || path.join(__dirname, '..', '..') });
+const scanner = createScanner({ appDir: resolveAppDir(args) });
 const { files, registerSrcFiles } = scanner;
 
 registerSrcFiles();

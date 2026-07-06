@@ -4,6 +4,35 @@ Cleans up an Opus UI application workspace: deletes unused JSON, merges and
 dedupes traits, strips dead props, and converts declarative scripts
 (`scps` / `fireScript` / `dtaScps`) to vanilla-JS source actions.
 
+## Configuration
+
+The tool locates everything from **`config.json`** in this folder:
+
+```json
+{
+	"appPath": "../../legoz"
+}
+```
+
+- `appPath` — where the Opus UI **app** lives (relative to this folder, or
+  absolute). It must contain a `package.json` and an `app/` folder.
+
+From there the tool reads the app's own configuration — the same chain the
+Opus UI packager uses:
+
+1. `<app>/package.json` → `"opusUiConfig": { "externalOpusUiConfig": ".opusUiConfig-master" }`
+   names an external config file inside the app folder.
+2. That file's `opusUiEnsembles` list defines every ensemble and **where it
+   resides** (external ensembles carry absolute `path`s; the rest resolve to
+   siblings of the app or `<app>/node_modules`). When no external file exists,
+   `package.json`'s own `opusUiEnsembles` is used.
+
+Everything — scanning, cleanup, conversion, size reports, `revert` — operates
+on exactly that set: the registered ensembles plus `<app>/app`.
+
+Per-invocation overrides: `--app=<dir>` (ignore config.json) or the legacy
+`--workspace=<dir>` (app assumed at `<workspace>/legoz`).
+
 ## Quick start
 
 ```bash

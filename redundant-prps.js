@@ -26,6 +26,7 @@
 const fs = require('fs');
 const path = require('path');
 const { createScanner } = require('./lib/scan-core');
+const { resolveAppDir } = require('./lib/app-config');
 const { loadDoc, parseArgs } = require('./lib/json-doc');
 
 const args = parseArgs();
@@ -36,7 +37,7 @@ Usage: node redundant-prps.js [options]
 
 Options:
   --print               Print every finding (default: first 20)
-  --workspace=<dir>     Workspace root (default: two levels up from this script)
+  --app=<dir>            App root (default: appPath from ../config.json)
   --out=<dir>           Report output directory (default: this folder)
   --help                Show this help
 `);
@@ -45,15 +46,18 @@ Options:
 
 const OUT_DIR = path.resolve(args.out || __dirname);
 
-const scanner = createScanner({ workspace: args.workspace || path.join(__dirname, '..', '..') });
-const { WORKSPACE, files } = scanner;
+const scanner = createScanner({ appDir: resolveAppDir(args) });
+const { APP, APP_DIR, files } = scanner;
 
 //---------------------------------------------------------------- load defaults
+//Component prop specs: the app's own components plus the opus-ui engine repos
+// (workspace siblings of the app, falling back to the app's node_modules).
 const PROPS_ROOTS = [
-	path.join(WORKSPACE, 'legoz', 'src', 'components'),
-	path.join(WORKSPACE, 'opus-ui', 'src', 'components'),
-	path.join(WORKSPACE, 'opus-ui-components', 'src', 'components'),
-	path.join(WORKSPACE, 'opus-ui-grid', 'src', 'components')
+	path.join(APP, 'src', 'components'),
+	...['opus-ui', 'opus-ui-components', 'opus-ui-grid'].flatMap(name => [
+		path.join(APP, '..', name, 'src', 'components'),
+		path.join(APP, 'node_modules', '@intenda', name, 'src', 'components')
+	])
 ];
 
 //Extract `const props = { ... }` via brace matching and evaluate the literal.
@@ -147,7 +151,7 @@ for (const root of PROPS_ROOTS) {
 
 //Theme propSpec overrides (app theme components.json): an overridden default
 // replaces the props.js one for comparison purposes.
-const themeComponents = loadDoc(path.join(WORKSPACE, 'legoz', 'app', 'theme', 'components.json'));
+const themeComponents = loadDoc(path.join(APP_DIR, 'theme', 'components.json'));
 let themedOverrides = 0;
 
 if (themeComponents && typeof themeComponents === 'object') {

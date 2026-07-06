@@ -18,6 +18,7 @@
 const fs = require('fs');
 const path = require('path');
 const { createScanner } = require('./lib/scan-core');
+const { resolveAppDir } = require('./lib/app-config');
 
 //---------------------------------------------------------------- CLI args
 const args = { _: [] };
@@ -42,7 +43,7 @@ Options:
                          if it exists, otherwise ./entrypoints.sample.txt
   --field=<name>         When the entrypoints file holds JSON objects, the field
                          containing the viewport value (default: loc_nme, value)
-  --workspace=<dir>      Workspace root (default: two levels up from this script)
+  --app=<dir>            App root (default: appPath from ../config.json)
   --out=<dir>            Output directory for reports (default: this folder)
   --explain=<file>       Print the reference chain that makes <file> used
                          (workspace-relative or absolute path)
@@ -54,8 +55,8 @@ Options:
 
 const OUT_DIR = path.resolve(args.out || __dirname);
 
-const scanner = createScanner({ workspace: args.workspace || path.join(__dirname, '..', '..') });
-const { WORKSPACE, APP_DIR, ensembles, files, norm, key, rel, scanFile, processRef, registerSrcFiles, parseEntrypointsFile } = scanner;
+const scanner = createScanner({ appDir: resolveAppDir(args) });
+const { APP, APP_DIR, absFromRel, ensembles, files, norm, key, rel, scanFile, processRef, registerSrcFiles, parseEntrypointsFile } = scanner;
 
 //---------------------------------------------------------------- reachability state
 const usedBy = new Map(); //key -> { referrer, via } (first edge that reached it)
@@ -139,7 +140,7 @@ while (queue.length) {
 if (args.explain) {
 	const target = path.isAbsolute(args.explain)
 		? args.explain
-		: path.join(WORKSPACE, args.explain);
+		: (absFromRel(args.explain) ?? args.explain);
 	const k = key(target);
 
 	if (!files.has(k)) {
@@ -232,7 +233,7 @@ if (missingEntrypoints.length)
 
 const report = {
 	generatedAt: new Date().toISOString(),
-	workspace: norm(WORKSPACE),
+	app: norm(APP),
 	entrypointsUsed: entryValues.length,
 	stats: {
 		totalJson: jsonInventory.length,

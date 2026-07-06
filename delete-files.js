@@ -38,14 +38,16 @@ structure), so "node undelete-files.js" can restore them.
 Options:
   --list=<file>       List of workspace-relative paths, one per line
                       (default: ./unused-files.txt — the output of find-unused-files.js)
-  --workspace=<dir>   Workspace root (default: two levels up from this script)
+  --app=<dir>         App root (default: appPath from ../config.json)
   --dry-run           Print what would be moved without moving anything
   --help              Show this help
 `);
 	process.exit(0);
 }
 
-const WORKSPACE = path.resolve(args.workspace || path.join(__dirname, '..', '..'));
+const { resolveAppDir, makeRelResolver } = require('./lib/app-config');
+const APP_DIR = resolveAppDir(args);
+const { absFromRel, rootFor } = makeRelResolver(APP_DIR, { withRoots: true });
 const TRASH = path.join(__dirname, 'deleted-files');
 const listPath = path.resolve(args.list || path.join(__dirname, 'unused-files.txt'));
 const dryRun = !!args['dry-run'];
@@ -62,9 +64,9 @@ const lines = fs.readFileSync(listPath, 'utf-8')
 	.filter(l => l && !l.startsWith('#'));
 
 //Remove directories that became empty after the move, walking up but never past
-// the workspace root.
-const pruneEmptyDirs = dir => {
-	const stop = path.resolve(WORKSPACE);
+// the owning ensemble/app root.
+const pruneEmptyDirs = (dir, stopRoot) => {
+	const stop = path.resolve(stopRoot);
 
 	while (path.resolve(dir) !== stop && path.resolve(dir).startsWith(stop)) {
 		let entries;
@@ -88,10 +90,11 @@ let skipped = 0;
 const manifest = [];
 
 for (const relPath of lines) {
-	//Only workspace-relative paths, no escaping upwards.
-	const src = path.resolve(WORKSPACE, relPath);
-	if (!src.startsWith(path.resolve(WORKSPACE)) || relPath.includes('..')) {
-		console.warn(`Skipped (outside workspace): ${relPath}`);
+	//Rel paths are <ensembleName>/inner or <appBasename>/inner — resolve via the
+	// ensemble registry, never by joining onto a root (roots can live anywhere).
+	const src = relPath.includes('..') ? null : absFromRel(relPath);
+	if (!src) {
+		console.warn(`Skipped (unknown root): ${relPath}`);
 		skipped++;
 		continue;
 	}
@@ -111,7 +114,7 @@ for (const relPath of lines) {
 
 	fs.mkdirSync(path.dirname(dest), { recursive: true });
 	fs.renameSync(src, dest);
-	pruneEmptyDirs(path.dirname(src));
+	pruneEmptyDirs(path.dirname(src), rootFor(relPath));
 	manifest.push(relPath);
 	moved++;
 }

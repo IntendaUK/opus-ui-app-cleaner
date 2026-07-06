@@ -8,17 +8,18 @@
 
 	  node revert.js            # revert everything
 	  node revert.js --dry      # show what would be reverted, change nothing
-	  node revert.js --workspace=<dir>
+	  node revert.js --app=<dir>   # default: appPath from ./config.json
 */
 
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
 const { parseArgs } = require('./lib/json-doc');
+const { resolveAppDir, readEnsembles } = require('./lib/app-config');
 
 const args = parseArgs();
 const DRY = !!args.dry;
-const WORKSPACE_ROOT = path.resolve(args.workspace || path.join(__dirname, '..', '..'));
+const APP_ROOT = resolveAppDir(args);
 
 const git = (cwd, ...gitArgs) => execFileSync('git', gitArgs, { cwd, stdio: 'pipe' });
 
@@ -46,38 +47,35 @@ console.log(`\n############ revert (${DRY ? 'DRY-RUN' : 'REVERTING'}) ##########
 let reverted = 0;
 let skipped = 0;
 
-for (const e of fs.readdirSync(WORKSPACE_ROOT, { withFileTypes: true })) {
-	if (!e.isDirectory() || !e.name.startsWith('l2_'))
-		continue;
-
-	const dir = path.join(WORKSPACE_ROOT, e.name);
-	if (!isGitRepo(dir)) {
+//Registered ensembles first, then the app's app/ folder.
+for (const e of readEnsembles(APP_ROOT)) {
+	if (!isGitRepo(e.root)) {
 		console.log(`  SKIP  ${e.name} (not a git repo)`);
 		skipped++;
 		continue;
 	}
 
 	if (DRY) {
-		const status = git(dir, 'status', '--porcelain').toString().trim();
+		const status = git(e.root, 'status', '--porcelain').toString().trim();
 		console.log(`  ${status ? 'WOULD REVERT' : 'clean       '}  ${e.name}${status ? ` (${status.split('\n').length} changes)` : ''}`);
 		continue;
 	}
 
-	git(dir, 'reset', '--hard', '-q');
-	git(dir, 'clean', '-fdq');
+	git(e.root, 'reset', '--hard', '-q');
+	git(e.root, 'clean', '-fdq');
 	console.log(`  OK    ${e.name}`);
 	reverted++;
 }
 
-const legoz = path.join(WORKSPACE_ROOT, 'legoz');
-if (fs.existsSync(path.join(legoz, 'app')) && isGitRepo(legoz)) {
+const appBase = path.basename(APP_ROOT);
+if (fs.existsSync(path.join(APP_ROOT, 'app')) && isGitRepo(APP_ROOT)) {
 	if (DRY) {
-		const status = git(legoz, 'status', '--porcelain', 'app').toString().trim();
-		console.log(`  ${status ? 'WOULD REVERT' : 'clean       '}  legoz/app${status ? ` (${status.split('\n').length} changes)` : ''}`);
+		const status = git(APP_ROOT, 'status', '--porcelain', 'app').toString().trim();
+		console.log(`  ${status ? 'WOULD REVERT' : 'clean       '}  ${appBase}/app${status ? ` (${status.split('\n').length} changes)` : ''}`);
 	} else {
-		git(legoz, 'checkout', '--', 'app');
-		git(legoz, 'clean', '-fdq', 'app');
-		console.log('  OK    legoz/app');
+		git(APP_ROOT, 'checkout', '--', 'app');
+		git(APP_ROOT, 'clean', '-fdq', 'app');
+		console.log(`  OK    ${appBase}/app`);
 		reverted++;
 	}
 }

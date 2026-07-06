@@ -27,6 +27,7 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const { createScanner } = require('./lib/scan-core');
+const { resolveAppDir } = require('./lib/app-config');
 const { computeTraitRefs, defaultEntrypointsPath } = require('./lib/trait-refs');
 const { loadDoc, saveDoc, replaceStringsInDoc, parseArgs } = require('./lib/json-doc');
 
@@ -38,7 +39,7 @@ Usage: node dedupe-identical-traits.js [options]
 
 Options:
   --apply               Actually modify files (default: dry-run report only)
-  --workspace=<dir>     Workspace root (default: two levels up from this script)
+  --app=<dir>            App root (default: appPath from ../config.json)
   --entrypoints=<file>  Menu dataset (default: entrypoints.txt / sample)
   --out=<dir>           Report output directory (default: this folder)
   --help                Show this help
@@ -50,8 +51,8 @@ const APPLY = !!args.apply;
 const OUT_DIR = path.resolve(args.out || __dirname);
 const BACKUP = path.join(__dirname, 'dedupe-backup');
 
-const scanner = createScanner({ workspace: args.workspace || path.join(__dirname, '..', '..') });
-const { WORKSPACE, files, key, rel, ensembles, ensemblesByName } = scanner;
+const scanner = createScanner({ appDir: resolveAppDir(args) });
+const { files, key, rel, ensembles, ensemblesByName } = scanner;
 
 const epPath = args.entrypoints ? path.resolve(args.entrypoints) : defaultEntrypointsPath(__dirname);
 const { traitFiles, refsTo } = computeTraitRefs(scanner, { entrypointsPath: epPath, field: args.field });

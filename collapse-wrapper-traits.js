@@ -24,6 +24,7 @@
 const fs = require('fs');
 const path = require('path');
 const { createScanner } = require('./lib/scan-core');
+const { resolveAppDir } = require('./lib/app-config');
 const { computeTraitRefs, defaultEntrypointsPath } = require('./lib/trait-refs');
 const { loadDoc, saveDoc, parseArgs } = require('./lib/json-doc');
 
@@ -35,7 +36,7 @@ Usage: node collapse-wrapper-traits.js [options]
 
 Options:
   --apply               Actually modify files (default: dry-run report only)
-  --workspace=<dir>     Workspace root (default: two levels up from this script)
+  --app=<dir>            App root (default: appPath from ../config.json)
   --entrypoints=<file>  Menu dataset (default: entrypoints.txt / sample)
   --out=<dir>           Report output directory (default: this folder)
   --help                Show this help
@@ -55,7 +56,7 @@ const prpsDropped = [];
 let round = 0;
 
 for (round = 1; round <= 10; round++) {
-	const scanner = createScanner({ workspace: args.workspace || path.join(__dirname, '..', '..') });
+	const scanner = createScanner({ appDir: resolveAppDir(args) });
 	const { files, key, ensembles, ensemblesByName } = scanner;
 
 	const epPath = args.entrypoints ? path.resolve(args.entrypoints) : defaultEntrypointsPath(__dirname);

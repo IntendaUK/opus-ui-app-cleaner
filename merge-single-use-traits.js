@@ -47,6 +47,7 @@
 const fs = require('fs');
 const path = require('path');
 const { createScanner } = require('./lib/scan-core');
+const { resolveAppDir } = require('./lib/app-config');
 const { computeTraitRefs, defaultEntrypointsPath } = require('./lib/trait-refs');
 
 //---------------------------------------------------------------- CLI
@@ -72,7 +73,7 @@ Options:
   --apply               Actually modify files (default: dry-run report only)
   --only=<relPath>      Only process this trait (repeatable via comma-separation)
   --maxPasses=<n>       Fixpoint iteration cap with --apply (default 10)
-  --workspace=<dir>     Workspace root (default: two levels up from this script)
+  --app=<dir>            App root (default: appPath from ../config.json)
   --entrypoints=<file>  Menu dataset (counts as references; default: entrypoints.txt)
   --field=<name>        Field for JSON entrypoints files
   --out=<dir>           Report output directory (default: this folder)
@@ -388,8 +389,8 @@ const deleteAuthFields = (mda, auth) => {
 };
 
 //---------------------------------------------------------------- setup
-const scanner = createScanner({ workspace: args.workspace || path.join(__dirname, '..', '..') });
-const { WORKSPACE, files, key, rel, ensembles, ensemblesByName } = scanner;
+const scanner = createScanner({ appDir: resolveAppDir(args) });
+const { absFromRel, files, key, rel, ensembles, ensemblesByName } = scanner;
 
 const epPath = args.entrypoints ? path.resolve(args.entrypoints) : defaultEntrypointsPath(__dirname);
 
@@ -864,7 +865,7 @@ const allSkipped = [];
 let pass = 0;
 
 for (pass = 1; pass <= MAX_PASSES; pass++) {
-	const passScanner = pass === 1 ? scanner : createScanner({ workspace: args.workspace || path.join(__dirname, '..', '..') });
+	const passScanner = pass === 1 ? scanner : createScanner({ appDir: resolveAppDir(args) });
 	const { traitFiles, refsTo } = computeTraitRefs(passScanner, { entrypointsPath: epPath, field: args.field });
 
 	const singleUse = [];
@@ -1042,7 +1043,7 @@ for (pass = 1; pass <= MAX_PASSES; pass++) {
 	}
 
 	for (const m of passMerged) {
-		const abs = path.join(WORKSPACE, m.trait);
+		const abs = absFromRel(m.trait);
 		const dest = path.join(BACKUP, 'traits', m.trait);
 		fs.mkdirSync(path.dirname(dest), { recursive: true });
 		fs.renameSync(abs, dest);
