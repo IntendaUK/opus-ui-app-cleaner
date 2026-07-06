@@ -30,6 +30,8 @@ const { loadDoc, saveDoc, parseArgs } = require('./helpers/json-doc');
 
 //Run artifacts (reports, backups, trash) live at the tool root, above src/.
 const TOOL_ROOT = path.join(__dirname, '..');
+const OUTPUT_DIR = path.join(TOOL_ROOT, 'output');
+fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 
 const args = parseArgs();
 
@@ -48,8 +50,8 @@ Options:
 }
 
 const APPLY = !!args.apply;
-const OUT_DIR = path.resolve(args.out || TOOL_ROOT);
-const BACKUP = path.join(TOOL_ROOT, 'collapse-backup');
+const OUT_DIR = path.resolve(args.out || OUTPUT_DIR);
+const BACKUP = path.join(OUTPUT_DIR, 'collapse-backup');
 
 const norm = p => path.resolve(p).replace(/\\/g, '/');
 

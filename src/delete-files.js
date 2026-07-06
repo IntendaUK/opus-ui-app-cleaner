@@ -49,10 +49,12 @@ const { resolveAppDir, makeRelResolver } = require('./helpers/app-config');
 
 //Run artifacts (reports, backups, trash) live at the tool root, above src/.
 const TOOL_ROOT = path.join(__dirname, '..');
+const OUTPUT_DIR = path.join(TOOL_ROOT, 'output');
+fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 const APP_DIR = resolveAppDir(args);
 const { absFromRel, rootFor } = makeRelResolver(APP_DIR, { withRoots: true });
-const TRASH = path.join(TOOL_ROOT, 'deleted-files');
-const listPath = path.resolve(args.list || path.join(TOOL_ROOT, 'unused-files.txt'));
+const TRASH = path.join(OUTPUT_DIR, 'deleted-files');
+const listPath = path.resolve(args.list || path.join(OUTPUT_DIR, 'unused-files.txt'));
 const dryRun = !!args['dry-run'];
 
 if (!fs.existsSync(listPath)) {

@@ -17,8 +17,8 @@ const { execFileSync } = require('child_process');
 const { parseArgs } = require('./helpers/json-doc');
 const { resolveAppDir, readEnsembles } = require('./helpers/app-config');
 
-//Run artifacts (reports, backups, trash) live at the tool root, above src/.
-const TOOL_ROOT = path.join(__dirname, '..');
+//All run artifacts live in output/ at the tool root.
+const OUTPUT_DIR = path.join(__dirname, '..', 'output');
 
 const args = parseArgs();
 const DRY = !!args.dry;
@@ -34,16 +34,6 @@ const isGitRepo = dir => {
 		return false;
 	}
 };
-
-//Same list as run-suite.js — run artifacts that are meaningless after a revert.
-const INTERNAL_STATE = [
-	'deleted-files', 'merged-traits-backup', 'collapse-backup', 'dedupe-backup',
-	'convert-backup', '.convert-check', 'check-refs-baseline.json',
-	'convert-report.json', 'merge-report.json', 'collapse-report.json',
-	'dedupe-report.json', 'unused-report.json', 'unused-traitprps-report.json',
-	'deleted-accept-prps-manifest.json', 'redundant-prps.json',
-	'unused-theme-keys.json', 'unused-files.txt', 'unused-roots.txt'
-];
 
 console.log(`\n############ revert (${DRY ? 'DRY-RUN' : 'REVERTING'}) ############\n`);
 
@@ -83,17 +73,9 @@ if (fs.existsSync(path.join(APP_ROOT, 'app')) && isGitRepo(APP_ROOT)) {
 	}
 }
 
-if (!DRY) {
-	const cleared = [];
-	for (const name of INTERNAL_STATE) {
-		const p = path.join(TOOL_ROOT, name);
-		if (fs.existsSync(p)) {
-			fs.rmSync(p, { recursive: true, force: true });
-			cleared.push(name);
-		}
-	}
-	if (cleared.length)
-		console.log(`\n  Cleared internal state: ${cleared.join(', ')}`);
+if (!DRY && fs.existsSync(OUTPUT_DIR)) {
+	fs.rmSync(OUTPUT_DIR, { recursive: true, force: true });
+	console.log('\n  Cleared output/ (run artifacts no longer match the workspace).');
 }
 
 console.log(DRY

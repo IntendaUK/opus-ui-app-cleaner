@@ -28,6 +28,8 @@ const { parseArgs } = require('./helpers/json-doc');
 
 //Run artifacts (reports, backups, trash) live at the tool root, above src/.
 const TOOL_ROOT = path.join(__dirname, '..');
+const OUTPUT_DIR = path.join(TOOL_ROOT, 'output');
+fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 
 const args = parseArgs();
 
@@ -46,7 +48,7 @@ Options:
 	process.exit(0);
 }
 
-const BASELINE_PATH = path.join(TOOL_ROOT, 'check-refs-baseline.json');
+const BASELINE_PATH = path.join(OUTPUT_DIR, 'check-refs-baseline.json');
 
 const scanner = createScanner({ appDir: resolveAppDir(args) });
 const { files, registerSrcFiles, scanFile, processRef, parseEntrypointsFile } = scanner;
@@ -114,7 +116,7 @@ const baselineDetails = new Set([...baseline].map(k => {
 //A ref whose target sits in ./deleted-files/ was broken BY the intentional
 // unused-file deletion (referrer is dead code that only JSON deletion left
 // behind, e.g. dev-harness JS) — warning, not failure.
-const trashDir = path.join(TOOL_ROOT, 'deleted-files');
+const trashDir = path.join(OUTPUT_DIR, 'deleted-files');
 const targetIsTrashed = ref => {
 	if (!ref.startsWith('@'))
 		return false;

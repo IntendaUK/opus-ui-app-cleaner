@@ -22,6 +22,8 @@ const { resolveAppDir } = require('./helpers/app-config');
 
 //Run artifacts (reports, backups, trash) live at the tool root, above src/.
 const TOOL_ROOT = path.join(__dirname, '..');
+const OUTPUT_DIR = path.join(TOOL_ROOT, 'output');
+fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 
 //---------------------------------------------------------------- CLI args
 const args = { _: [] };
@@ -56,7 +58,7 @@ Options:
 	process.exit(0);
 }
 
-const OUT_DIR = path.resolve(args.out || TOOL_ROOT);
+const OUT_DIR = path.resolve(args.out || OUTPUT_DIR);
 
 const scanner = createScanner({ appDir: resolveAppDir(args) });
 const { APP, APP_DIR, absFromRel, ensembles, files, norm, key, rel, scanFile, processRef, registerSrcFiles, parseEntrypointsFile } = scanner;

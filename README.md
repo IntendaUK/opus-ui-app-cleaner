@@ -86,9 +86,9 @@ convergence). Without `--apply` everything runs in report-only mode.
 
 ## Outputs and undo
 
-- Every step writes a `*-report.json` into the tool root documenting exactly
+- Every step writes its reports into `output/` at the tool root, documenting exactly
   what changed; the summary prints total passes and workspace size before/after.
-- `deleted-files/` and the `*-backup/` folders are the undo record for the
+- `output/deleted-files/` and the `output/*-backup/` folders are the undo record for the
   latest run. They survive until the **next** `--apply` run clears them —
   commit the ensembles before re-running if you want to keep the escape hatch.
 - Full revert: `npm run revert` (git-restores every ensemble + `legoz/app`

@@ -50,8 +50,11 @@ const { execFileSync } = require('child_process');
 const { parseArgs } = require('./helpers/json-doc');
 const { resolveAppDir, readEnsembles } = require('./helpers/app-config');
 
-//Run artifacts (reports, backups, trash) live at the tool root, above src/.
+//All run artifacts (reports, backups, trash, baseline) live in output/ at the
+// tool root, above src/.
 const TOOL_ROOT = path.join(__dirname, '..');
+const OUTPUT_DIR = path.join(TOOL_ROOT, 'output');
+fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 
 const args = parseArgs();
 
@@ -206,27 +209,15 @@ const measureWorkspaceChars = () => {
 };
 
 //---------------------------------------------------------------- self-clean
-//Internal state from a PREVIOUS run (trash, backups, reports, baseline). The
+//All run artifacts (trash, backups, reports, baseline) live in output/ —
+// clearing state from a previous run means wiping that one folder. The
 // ensembles themselves are never touched here — git is their undo path.
-const INTERNAL_STATE = [
-	'deleted-files', 'merged-traits-backup', 'collapse-backup', 'dedupe-backup',
-	'convert-backup', 'check-refs-baseline.json', 'convert-report.json',
-	'merge-report.json', 'collapse-report.json', 'dedupe-report.json',
-	'unused-report.json', 'unused-traitprps-report.json',
-	'deleted-accept-prps-manifest.json', 'redundant-prps.json',
-	'unused-theme-keys.json', 'unused-files.txt', 'unused-roots.txt'
-];
-
 const selfClean = () => {
-	const cleared = [];
-	for (const name of INTERNAL_STATE) {
-		const p = path.join(TOOL_ROOT, name);
-		if (fs.existsSync(p)) {
-			fs.rmSync(p, { recursive: true, force: true });
-			cleared.push(name);
-		}
-	}
-	return cleared;
+	if (!fs.existsSync(OUTPUT_DIR))
+		return false;
+	fs.rmSync(OUTPUT_DIR, { recursive: true, force: true });
+	fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+	return true;
 };
 
 //Content hash over the same file set as the size measure — a pass that leaves
@@ -261,9 +252,8 @@ const startedAt = Date.now();
 
 console.log(`\n############ cleanup-suite (${APPLY ? 'APPLY' : 'DRY-RUN'}) ############`);
 if (APPLY) {
-	const cleared = selfClean();
-	if (cleared.length)
-		console.log(`Cleared internal state from the previous run: ${cleared.join(', ')}`);
+	if (selfClean())
+		console.log('Cleared output/ from the previous run.');
 	console.log('Mutating the workspace. Revert = git reset --hard in every ensemble + legoz.\n');
 }
 

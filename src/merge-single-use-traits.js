@@ -52,6 +52,8 @@ const { computeTraitRefs, defaultEntrypointsPath } = require('./helpers/trait-re
 
 //Run artifacts (reports, backups, trash) live at the tool root, above src/.
 const TOOL_ROOT = path.join(__dirname, '..');
+const OUTPUT_DIR = path.join(TOOL_ROOT, 'output');
+fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 
 //---------------------------------------------------------------- CLI
 const args = {};
@@ -88,14 +90,14 @@ Options:
 
 const APPLY = !!args.apply;
 const MAX_PASSES = APPLY ? Number(args.maxPasses ?? 10) : 1;
-const OUT_DIR = path.resolve(args.out || TOOL_ROOT);
-const BACKUP = path.join(TOOL_ROOT, 'merged-traits-backup');
+const OUT_DIR = path.resolve(args.out || OUTPUT_DIR);
+const BACKUP = path.join(OUTPUT_DIR, 'merged-traits-backup');
 const ONLY = args.only ? new Set(String(args.only).split(',').map(s => s.trim().replace(/\\/g, '/'))) : null;
 
 //Merging while unused files sit in the trash is dangerous: a trait that looks
 // single-use now may have a second reference inside a trashed file, and restoring
 // the trash would leave that reference dangling.
-const trashDir = path.join(TOOL_ROOT, 'deleted-files');
+const trashDir = path.join(OUTPUT_DIR, 'deleted-files');
 if (fs.existsSync(trashDir)) {
 	if (APPLY && !args['ignore-trash']) {
 		console.error('\nERROR: ./deleted-files/ exists — files are currently soft-deleted.');

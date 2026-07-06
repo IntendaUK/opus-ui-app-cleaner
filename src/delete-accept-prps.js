@@ -30,6 +30,8 @@ const path = require('path');
 
 //Run artifacts (reports, backups, trash) live at the tool root, above src/.
 const TOOL_ROOT = path.join(__dirname, '..');
+const OUTPUT_DIR = path.join(TOOL_ROOT, 'output');
+fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 
 //---------------------------------------------------------------- CLI args
 const args = {};
@@ -65,7 +67,7 @@ Options:
 const { resolveAppDir, makeRelResolver } = require('./helpers/app-config');
 const APP_DIR = resolveAppDir(args);
 const absFromRel = makeRelResolver(APP_DIR);
-const MANIFEST_PATH = path.join(TOOL_ROOT, 'deleted-accept-prps-manifest.json');
+const MANIFEST_PATH = path.join(OUTPUT_DIR, 'deleted-accept-prps-manifest.json');
 const dryRun = !!args['dry-run'];
 
 //Canonical write — mirrors .claude/hooks/validate-json.cjs: tab indentation,
