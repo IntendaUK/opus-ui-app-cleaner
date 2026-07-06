@@ -1,0 +1,13 @@
+# Viewport values from the menu dataset (loc_nme column).
+# One per line; "?prc_idn=..." query strings are allowed and stripped automatically.
+# Replace this with the full export of the dataset: copy it to entrypoints.txt
+# (or pass --entrypoints=<file>).
+@l2_dashboards/account_management/index
+@l2_dashboards/l2_object_builder/explorer
+@l2_dashboards/component_list/index
+@l2_ontology/reskin/index
+@l2_ontology/explorer/index
+@l2_dashboards/l2_system_administration/explorer
+@l2_dashboards/l2_download_centre/explorer
+@l2_dashboards/l2_training_material/index?prc_idn=101
+@l2_dashboards/l2_training_material/index?prc_idn=102

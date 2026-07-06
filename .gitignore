@@ -1,0 +1,17 @@
+# Run artifacts — regenerated every run; the suite self-cleans these at the
+# start of each --apply run. deleted-files/ and *-backup/ are the undo record
+# for the most recent run.
+deleted-files/
+*-backup/
+.convert-check/
+*.log
+check-refs-baseline.json
+*-report.json
+deleted-accept-prps-manifest.json
+redundant-prps.json
+unused-theme-keys.json
+unused-files.txt
+unused-roots.txt
+
+# Machine-specific entrypoints (copy entrypoints.sample.txt)
+entrypoints.txt

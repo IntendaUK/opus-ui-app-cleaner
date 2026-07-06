@@ -1,0 +1,10 @@
+{
+	"name": "opus-ui-app-cleaner",
+	"version": "1.0.0",
+	"private": true,
+	"description": "Cleans up an Opus UI application workspace and converts declarative scripts to vanilla-JS source actions.",
+	"scripts": {
+		"start": "node run-suite.js --apply",
+		"revert": "node revert.js"
+	}
+}
