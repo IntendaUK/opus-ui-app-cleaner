@@ -4,7 +4,7 @@
 	"private": true,
 	"description": "Cleans up an Opus UI application workspace and converts declarative scripts to vanilla-JS source actions.",
 	"scripts": {
-		"start": "node run-suite.js --apply",
-		"revert": "node revert.js"
+		"start": "node src/run-suite.js --apply",
+		"revert": "node src/revert.js"
 	}
 }

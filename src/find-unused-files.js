@@ -17,8 +17,11 @@
 
 const fs = require('fs');
 const path = require('path');
-const { createScanner } = require('./lib/scan-core');
-const { resolveAppDir } = require('./lib/app-config');
+const { createScanner } = require('./helpers/scan-core');
+const { resolveAppDir } = require('./helpers/app-config');
+
+//Run artifacts (reports, backups, trash) live at the tool root, above src/.
+const TOOL_ROOT = path.join(__dirname, '..');
 
 //---------------------------------------------------------------- CLI args
 const args = { _: [] };
@@ -53,7 +56,7 @@ Options:
 	process.exit(0);
 }
 
-const OUT_DIR = path.resolve(args.out || __dirname);
+const OUT_DIR = path.resolve(args.out || TOOL_ROOT);
 
 const scanner = createScanner({ appDir: resolveAppDir(args) });
 const { APP, APP_DIR, absFromRel, ensembles, files, norm, key, rel, scanFile, processRef, registerSrcFiles, parseEntrypointsFile } = scanner;
@@ -98,8 +101,8 @@ const loadEntrypoints = () => {
 	let epPath = args.entrypoints;
 	if (!epPath) {
 		for (const cand of ['entrypoints.txt', 'entrypoints.json', 'entrypoints.sample.txt']) {
-			if (fs.existsSync(path.join(__dirname, cand))) {
-				epPath = path.join(__dirname, cand);
+			if (fs.existsSync(path.join(TOOL_ROOT, cand))) {
+				epPath = path.join(TOOL_ROOT, cand);
 				break;
 			}
 		}

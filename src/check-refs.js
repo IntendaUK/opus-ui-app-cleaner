@@ -21,10 +21,13 @@
 
 const fs = require('fs');
 const path = require('path');
-const { createScanner } = require('./lib/scan-core');
-const { resolveAppDir } = require('./lib/app-config');
-const { defaultEntrypointsPath } = require('./lib/trait-refs');
-const { parseArgs } = require('./lib/json-doc');
+const { createScanner } = require('./helpers/scan-core');
+const { resolveAppDir } = require('./helpers/app-config');
+const { defaultEntrypointsPath } = require('./helpers/trait-refs');
+const { parseArgs } = require('./helpers/json-doc');
+
+//Run artifacts (reports, backups, trash) live at the tool root, above src/.
+const TOOL_ROOT = path.join(__dirname, '..');
 
 const args = parseArgs();
 
@@ -43,7 +46,7 @@ Options:
 	process.exit(0);
 }
 
-const BASELINE_PATH = path.join(__dirname, 'check-refs-baseline.json');
+const BASELINE_PATH = path.join(TOOL_ROOT, 'check-refs-baseline.json');
 
 const scanner = createScanner({ appDir: resolveAppDir(args) });
 const { files, registerSrcFiles, scanFile, processRef, parseEntrypointsFile } = scanner;
@@ -71,7 +74,7 @@ for (const [k, f] of files) {
 }
 
 //3: entrypoints
-const epPath = args.entrypoints ? path.resolve(args.entrypoints) : defaultEntrypointsPath(__dirname);
+const epPath = args.entrypoints ? path.resolve(args.entrypoints) : defaultEntrypointsPath(TOOL_ROOT);
 if (epPath) {
 	const rootFile = { path: '(menu dataset)', relPath: '(menu dataset)', ensemble: null, kind: 'json' };
 	for (const v of parseEntrypointsFile(epPath, args.field)) {
@@ -111,7 +114,7 @@ const baselineDetails = new Set([...baseline].map(k => {
 //A ref whose target sits in ./deleted-files/ was broken BY the intentional
 // unused-file deletion (referrer is dead code that only JSON deletion left
 // behind, e.g. dev-harness JS) — warning, not failure.
-const trashDir = path.join(__dirname, 'deleted-files');
+const trashDir = path.join(TOOL_ROOT, 'deleted-files');
 const targetIsTrashed = ref => {
 	if (!ref.startsWith('@'))
 		return false;

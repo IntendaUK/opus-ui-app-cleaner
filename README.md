@@ -41,7 +41,7 @@ cd tools/opus-ui-app-cleaner
 # 1. Reset the workspace to committed state (the suite mutates it)
 npm run revert
 
-# 2. Run the suite (dry-run preview: node run-suite.js without --apply)
+# 2. Run the suite (dry-run preview: node src/run-suite.js without --apply)
 npm start
 
 # 3. Build the package
@@ -49,8 +49,8 @@ npm start
 ```
 
 `npm run revert` restores every `l2_*` ensemble and `legoz/app` to committed
-git state and clears this tool's run artifacts (`revert.js --dry` previews
-what it would touch). `npm start` runs `run-suite.js --apply`.
+git state and clears this tool's run artifacts (`node src/revert.js --dry` previews
+what it would touch). `npm start` runs `src/run-suite.js --apply`.
 
 With `--apply` the suite clears its own state from the previous run, then
 repeats all steps in passes until a full pass changes nothing (content-hash

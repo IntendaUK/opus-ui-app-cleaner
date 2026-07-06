@@ -21,9 +21,12 @@
 
 const fs = require('fs');
 const path = require('path');
-const { createScanner } = require('./lib/scan-core');
-const { resolveAppDir } = require('./lib/app-config');
-const { loadDoc, parseArgs } = require('./lib/json-doc');
+const { createScanner } = require('./helpers/scan-core');
+const { resolveAppDir } = require('./helpers/app-config');
+const { loadDoc, parseArgs } = require('./helpers/json-doc');
+
+//Run artifacts (reports, backups, trash) live at the tool root, above src/.
+const TOOL_ROOT = path.join(__dirname, '..');
 
 const args = parseArgs();
 
@@ -40,7 +43,7 @@ Options:
 	process.exit(0);
 }
 
-const OUT_DIR = path.resolve(args.out || __dirname);
+const OUT_DIR = path.resolve(args.out || TOOL_ROOT);
 
 const scanner = createScanner({ appDir: resolveAppDir(args) });
 const { files, registerSrcFiles } = scanner;

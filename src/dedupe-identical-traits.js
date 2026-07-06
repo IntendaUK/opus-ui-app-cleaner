@@ -26,10 +26,13 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const { createScanner } = require('./lib/scan-core');
-const { resolveAppDir } = require('./lib/app-config');
-const { computeTraitRefs, defaultEntrypointsPath } = require('./lib/trait-refs');
-const { loadDoc, saveDoc, replaceStringsInDoc, parseArgs } = require('./lib/json-doc');
+const { createScanner } = require('./helpers/scan-core');
+const { resolveAppDir } = require('./helpers/app-config');
+const { computeTraitRefs, defaultEntrypointsPath } = require('./helpers/trait-refs');
+const { loadDoc, saveDoc, replaceStringsInDoc, parseArgs } = require('./helpers/json-doc');
+
+//Run artifacts (reports, backups, trash) live at the tool root, above src/.
+const TOOL_ROOT = path.join(__dirname, '..');
 
 const args = parseArgs();
 
@@ -48,13 +51,13 @@ Options:
 }
 
 const APPLY = !!args.apply;
-const OUT_DIR = path.resolve(args.out || __dirname);
-const BACKUP = path.join(__dirname, 'dedupe-backup');
+const OUT_DIR = path.resolve(args.out || TOOL_ROOT);
+const BACKUP = path.join(TOOL_ROOT, 'dedupe-backup');
 
 const scanner = createScanner({ appDir: resolveAppDir(args) });
 const { files, key, rel, ensembles, ensemblesByName } = scanner;
 
-const epPath = args.entrypoints ? path.resolve(args.entrypoints) : defaultEntrypointsPath(__dirname);
+const epPath = args.entrypoints ? path.resolve(args.entrypoints) : defaultEntrypointsPath(TOOL_ROOT);
 const { traitFiles, refsTo } = computeTraitRefs(scanner, { entrypointsPath: epPath, field: args.field });
 
 const RELATIVE_REF = /^\.\/[^\s'"`<>|]+$/;

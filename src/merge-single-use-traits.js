@@ -46,9 +46,12 @@
 
 const fs = require('fs');
 const path = require('path');
-const { createScanner } = require('./lib/scan-core');
-const { resolveAppDir } = require('./lib/app-config');
-const { computeTraitRefs, defaultEntrypointsPath } = require('./lib/trait-refs');
+const { createScanner } = require('./helpers/scan-core');
+const { resolveAppDir } = require('./helpers/app-config');
+const { computeTraitRefs, defaultEntrypointsPath } = require('./helpers/trait-refs');
+
+//Run artifacts (reports, backups, trash) live at the tool root, above src/.
+const TOOL_ROOT = path.join(__dirname, '..');
 
 //---------------------------------------------------------------- CLI
 const args = {};
@@ -85,14 +88,14 @@ Options:
 
 const APPLY = !!args.apply;
 const MAX_PASSES = APPLY ? Number(args.maxPasses ?? 10) : 1;
-const OUT_DIR = path.resolve(args.out || __dirname);
-const BACKUP = path.join(__dirname, 'merged-traits-backup');
+const OUT_DIR = path.resolve(args.out || TOOL_ROOT);
+const BACKUP = path.join(TOOL_ROOT, 'merged-traits-backup');
 const ONLY = args.only ? new Set(String(args.only).split(',').map(s => s.trim().replace(/\\/g, '/'))) : null;
 
 //Merging while unused files sit in the trash is dangerous: a trait that looks
 // single-use now may have a second reference inside a trashed file, and restoring
 // the trash would leave that reference dangling.
-const trashDir = path.join(__dirname, 'deleted-files');
+const trashDir = path.join(TOOL_ROOT, 'deleted-files');
 if (fs.existsSync(trashDir)) {
 	if (APPLY && !args['ignore-trash']) {
 		console.error('\nERROR: ./deleted-files/ exists — files are currently soft-deleted.');
@@ -392,7 +395,7 @@ const deleteAuthFields = (mda, auth) => {
 const scanner = createScanner({ appDir: resolveAppDir(args) });
 const { absFromRel, files, key, rel, ensembles, ensemblesByName } = scanner;
 
-const epPath = args.entrypoints ? path.resolve(args.entrypoints) : defaultEntrypointsPath(__dirname);
+const epPath = args.entrypoints ? path.resolve(args.entrypoints) : defaultEntrypointsPath(TOOL_ROOT);
 
 const norm = p => path.resolve(p).replace(/\\/g, '/');
 

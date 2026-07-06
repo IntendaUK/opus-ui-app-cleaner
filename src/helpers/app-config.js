@@ -17,7 +17,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const TOOL_ROOT = path.join(__dirname, '..');
+const TOOL_ROOT = path.join(__dirname, '..', '..');
 
 const norm = p => path.resolve(p).replace(/\\/g, '/');
 

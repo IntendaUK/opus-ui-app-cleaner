@@ -29,10 +29,13 @@
 const fs = require('fs');
 const path = require('path');
 const { spawnSync } = require('child_process');
-const { createScanner } = require('./lib/scan-core');
-const { resolveAppDir } = require('./lib/app-config');
-const { generateScript } = require('./lib/script-codegen');
-const { loadDoc, saveDoc, parseArgs } = require('./lib/json-doc');
+const { createScanner } = require('./helpers/scan-core');
+const { resolveAppDir } = require('./helpers/app-config');
+const { generateScript } = require('./helpers/script-codegen');
+const { loadDoc, saveDoc, parseArgs } = require('./helpers/json-doc');
+
+//Run artifacts (reports, backups, trash) live at the tool root, above src/.
+const TOOL_ROOT = path.join(__dirname, '..');
 
 const args = parseArgs();
 
@@ -55,8 +58,8 @@ Options:
 const APPLY = !!args.apply;
 const ONLY = args.only ? String(args.only).replace(/\\/g, '/').toLowerCase() : null;
 const MIN_NATIVE = Number(args.minNative ?? 0);
-const OUT_DIR = path.resolve(args.out || __dirname);
-const BACKUP = path.join(__dirname, 'convert-backup');
+const OUT_DIR = path.resolve(args.out || TOOL_ROOT);
+const BACKUP = path.join(TOOL_ROOT, 'convert-backup');
 
 const scanner = createScanner({ appDir: resolveAppDir(args) });
 const { files } = scanner;

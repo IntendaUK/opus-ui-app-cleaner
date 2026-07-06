@@ -28,6 +28,9 @@
 const fs = require('fs');
 const path = require('path');
 
+//Run artifacts (reports, backups, trash) live at the tool root, above src/.
+const TOOL_ROOT = path.join(__dirname, '..');
+
 //---------------------------------------------------------------- CLI args
 const args = {};
 process.argv.slice(2).forEach(a => {
@@ -59,10 +62,10 @@ Options:
 	process.exit(0);
 }
 
-const { resolveAppDir, makeRelResolver } = require('./lib/app-config');
+const { resolveAppDir, makeRelResolver } = require('./helpers/app-config');
 const APP_DIR = resolveAppDir(args);
 const absFromRel = makeRelResolver(APP_DIR);
-const MANIFEST_PATH = path.join(__dirname, 'deleted-accept-prps-manifest.json');
+const MANIFEST_PATH = path.join(TOOL_ROOT, 'deleted-accept-prps-manifest.json');
 const dryRun = !!args['dry-run'];
 
 //Canonical write — mirrors .claude/hooks/validate-json.cjs: tab indentation,
@@ -144,8 +147,9 @@ if (args.undo) {
 }
 
 //---------------------------------------------------------------- delete mode
-const { createScanner } = require('./lib/scan-core');
-const { analyzeAcceptPrps } = require('./lib/accept-prps-core');
+const { createScanner } = require('./helpers/scan-core');
+const { analyzeAcceptPrps } = require('./helpers/accept-prps-core');
+
 
 const scanner = createScanner({ appDir: APP_DIR });
 const { traits } = analyzeAcceptPrps(scanner);

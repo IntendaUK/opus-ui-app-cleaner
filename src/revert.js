@@ -14,8 +14,11 @@
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
-const { parseArgs } = require('./lib/json-doc');
-const { resolveAppDir, readEnsembles } = require('./lib/app-config');
+const { parseArgs } = require('./helpers/json-doc');
+const { resolveAppDir, readEnsembles } = require('./helpers/app-config');
+
+//Run artifacts (reports, backups, trash) live at the tool root, above src/.
+const TOOL_ROOT = path.join(__dirname, '..');
 
 const args = parseArgs();
 const DRY = !!args.dry;
@@ -83,7 +86,7 @@ if (fs.existsSync(path.join(APP_ROOT, 'app')) && isGitRepo(APP_ROOT)) {
 if (!DRY) {
 	const cleared = [];
 	for (const name of INTERNAL_STATE) {
-		const p = path.join(__dirname, name);
+		const p = path.join(TOOL_ROOT, name);
 		if (fs.existsSync(p)) {
 			fs.rmSync(p, { recursive: true, force: true });
 			cleared.push(name);

@@ -47,8 +47,11 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const { execFileSync } = require('child_process');
-const { parseArgs } = require('./lib/json-doc');
-const { resolveAppDir, readEnsembles } = require('./lib/app-config');
+const { parseArgs } = require('./helpers/json-doc');
+const { resolveAppDir, readEnsembles } = require('./helpers/app-config');
+
+//Run artifacts (reports, backups, trash) live at the tool root, above src/.
+const TOOL_ROOT = path.join(__dirname, '..');
 
 const args = parseArgs();
 
@@ -65,7 +68,7 @@ Options:
                         unused, delete, acceptprps, collapse, dedupe, traitprps,
                         merge, srcactions, check, redundant, themekeys
   --entrypoints=<file>  Menu dataset passed to every step that takes one
-  --app=<dir>           App root (default: appPath from ./config.json)
+  --app=<dir>           App root (default: appPath from ../config.json)
   --workspace=<dir>     Legacy: app assumed at <workspace>/legoz
   --help                Show this help
 `);
@@ -217,7 +220,7 @@ const INTERNAL_STATE = [
 const selfClean = () => {
 	const cleared = [];
 	for (const name of INTERNAL_STATE) {
-		const p = path.join(__dirname, name);
+		const p = path.join(TOOL_ROOT, name);
 		if (fs.existsSync(p)) {
 			fs.rmSync(p, { recursive: true, force: true });
 			cleared.push(name);
