@@ -70,7 +70,13 @@ const HELPERS = {
 	__delKey: 'const __delKey = (o, p) => { const parts = String(p).split(\'.\'); const last = parts.pop(); let t = o; for (const s of parts) { if (t === null || t === undefined) return; t = t[s]; } if (t !== null && t !== undefined) delete t[last]; };',
 	__buildMsg: 'const __buildMsg = c => ({ msg: c.msg, type: c.msgType ?? \'info\', autoClose: c.autoClose ?? true, isGlobal: c.isGlobal ?? false, duration: c.duration });',
 	__absPos: 'const __absPos = n => { let left = n.offsetLeft, top = n.offsetTop; if (getComputedStyle(n).position !== \'absolute\') { let p = n.offsetParent; while (p) { left += p.offsetLeft; top += p.offsetTop; if (getComputedStyle(p).position === \'absolute\') break; p = p.offsetParent; } } return { left, right: left + n.offsetWidth, top, bottom: top + n.offsetHeight, width: n.offsetWidth, height: n.offsetHeight }; };',
-	__tryEval: 'const __tryEval = f => { try { return f(); } catch (e) { console.error(\'Evaluation crashed\', e); } };'
+	__tryEval: 'const __tryEval = f => { try { return f(); } catch (e) { console.error(\'Evaluation crashed\', e); } };',
+	//Trait-prp wildcard splices (engine getMorphedString/getVariableValue semantics:
+	// undefined prp keeps the raw wildcard text; %-form text-splices with array
+	// join(\' \'); $-form embeds JSON (string arrays join), chained wildcards raw).
+	__wjoin: 'const __wjoin = (v, raw) => v === undefined ? raw : (Array.isArray(v) ? v.join(\' \') : String(v));',
+	__wdirect: 'const __wdirect = (v, raw) => { if (v === undefined) return raw; if (typeof v === \'string\' && /^[%$][\\w.]+[%$]$/.test(v)) return v; if (Array.isArray(v) && v.every(x => typeof x === \'string\')) return JSON.stringify(v.join(\' \')); const o = JSON.stringify(v); return o === undefined ? raw : o; };',
+	__wval: 'const __wval = (v, raw) => v === undefined ? raw : v;'
 };
 
 const OPERATOR_EXPR = {
@@ -104,6 +110,17 @@ const RESERVED = new Set([
 
 const SCOPED_TOKEN = /\|\|[\w.$%/-]+\|\|/g;
 
+//Trait-prp wildcards (%x% morph / $x$ direct). Substituted at trait-application
+// time — a static JS file can't receive per-application values, so each span is
+// extracted VERBATIM into the emitted action's __traitParams (where the trait
+// engine keeps substituting it) and the JS reads config.__traitParams.<name>.
+const WILDCARD_SPAN = /%[A-Za-z_][\w.]*%|\$[A-Za-z_][\w.]*\$/g;
+const WILDCARD_WHOLE = /^(?:%[A-Za-z_][\w.]*%|\$[A-Za-z_][\w.]*\$)$/;
+const hasWildcard = s => {
+	WILDCARD_SPAN.lastIndex = 0;
+	return WILDCARD_SPAN.test(s);
+};
+
 class SkipScript extends Error {}
 
 class Codegen {
@@ -122,6 +139,11 @@ class Codegen {
 		// per-row clone substitutes it; generated JS reads the substituted value from
 		// config.__rowParams at run time.
 		this.rowParams = new Map();
+
+		//Trait-prp wildcards (%x%/$x$) found in this script: verbatim span ->
+		// config param name, emitted under the action's __traitParams (same
+		// mechanism as rowParams — the trait engine substitutes the JSON).
+		this.traitParams = new Map();
 		this.flattenStack = [];
 		this.helpers = new Set();
 		this.imports = new Set(); //module import lines
@@ -212,6 +234,73 @@ class Codegen {
 		return `config.__rowParams.${name}`;
 	}
 
+	//Trait-prp wildcard span -> config.__traitParams access.
+	traitParamExpr (spanText) {
+		let name = this.traitParams.get(spanText);
+		if (!name) {
+			name = spanText.slice(1, -1).replace(/[^\w$]/g, '_') + (spanText[0] === '$' ? '_d' : '');
+			while ([...this.traitParams.values()].includes(name))
+				name += '_';
+			this.traitParams.set(spanText, name);
+		}
+		this.use('config');
+		return `config.__traitParams.${name}`;
+	}
+
+	/*
+		Escapes a raw literal text segment for a template literal, splicing the two
+		TEXT-substitution layers the engine ran over raw strings:
+		  - ||scoped.id|| tokens -> resolveId(...) (wildcards INSIDE a token splice
+		    into the token text first — the trait engine substituted them there);
+		  - %x%/$x$ trait-prp wildcards -> __traitParams splices (engine morph
+		    semantics: %-form text splice, $-form embedded JSON).
+		Spliced ${…} expressions are never post-processed.
+	*/
+	litSegment (raw, { keepTheme = false } = {}) {
+		const esc = x => {
+			let e = x.replace(/[`\\$]/g, c => '\\' + c);
+			if (keepTheme)
+				e = e.replace(/\\\$\\\{theme\./g, '${theme.');
+			return e;
+		};
+
+		const wildcardSplice = t => {
+			if (t[0] === '$') {
+				this.helper('__wdirect');
+				return '${__wdirect(' + this.traitParamExpr(t) + ', ' + JSON.stringify(t) + ')}';
+			}
+			this.helper('__wjoin');
+			return '${__wjoin(' + this.traitParamExpr(t) + ', ' + JSON.stringify(t) + ')}';
+		};
+
+		const combined = new RegExp(`${SCOPED_TOKEN.source}|${WILDCARD_SPAN.source}`, 'g');
+		let out = '';
+		let last = 0;
+		for (const m of raw.matchAll(combined)) {
+			out += esc(raw.slice(last, m.index));
+			const t = m[0];
+			if (t.startsWith('||')) {
+				this.use('resolveId');
+				if (hasWildcard(t)) {
+					//Scoped token whose TEXT contains wildcards: build the token first.
+					let inner = '';
+					let p = 0;
+					for (const w of t.matchAll(WILDCARD_SPAN)) {
+						inner += esc(t.slice(p, w.index)) + wildcardSplice(w[0]);
+						p = w.index + w[0].length;
+					}
+					inner += esc(t.slice(p));
+					out += '${resolveId(`' + inner + '`)}';
+				} else
+					out += '${resolveId(' + JSON.stringify(t) + ')}';
+			} else
+				out += wildcardSplice(t);
+			last = m.index + t.length;
+		}
+		out += esc(raw.slice(last));
+		return out;
+	}
+
 	//---------------------------------------------------------- accessor parsing
 	findAccessorSpans (s) {
 		const spans = [];
@@ -265,6 +354,12 @@ class Codegen {
 			return null;
 
 		const rest = tokens.slice(type.length + 1);
+
+		//Trait-prp wildcards INSIDE accessor grammar (component ids, variable
+		// names, drill paths) aren't expressible as config params — fail closed
+		// rather than freeze the wildcard text into the accessor.
+		if (type !== 'eval' && hasWildcard(rest))
+			return this.morphFallback(rawWithDelims, ctx);
 
 		if (type === 'variable') {
 			//Dynamic drill-path segments ({{variable.records.((state.self.idx))}}):
@@ -374,6 +469,10 @@ class Codegen {
 	evalExpr (body, ctx, rawWithDelims) {
 		const spans = this.findAccessorSpans(body);
 		const hasTheme = body.includes('{theme.');
+		const hasWildcards = hasWildcard(body);
+
+		if (/[%$]\.\.\./.test(body))
+			throw new SkipScript('spread trait-prp wildcard ($...x$) inside eval');
 
 		/*
 			Eval bodies containing accessors or theme refs replicate the runtime's
@@ -385,17 +484,11 @@ class Codegen {
 			applyThemesToMdaPackage resolves it at app boot. The template is then
 			eval'd — the exact post-splice text the declarative engine evaluated.
 		*/
-		if (spans.length || hasTheme) {
-			//Scoped tokens resolve only in the LITERAL text segments — never inside
-			// spliced expressions (their internal "||…||" literals resolve at call
-			// time via getExternalState/resolveId already).
-			const esc = s => s.replace(/[`\\$]/g, x => '\\' + x)
-				//un-escape theme accessors so package resolution still sees them
-				.replace(/\\\$\\\{theme\./g, '${theme.')
-				.replace(SCOPED_TOKEN, m => {
-					this.use('resolveId');
-					return '${resolveId(' + JSON.stringify(m) + ')}';
-				});
+		if (spans.length || hasTheme || hasWildcards) {
+			//Scoped tokens and trait-prp wildcards resolve only in the LITERAL text
+			// segments — never inside spliced expressions (their internal "||…||"
+			// literals resolve at call time via getExternalState/resolveId already).
+			const esc = s => this.litSegment(s, { keepTheme: true });
 			let tpl = '';
 			let pos = 0;
 			for (const sp of spans) {
@@ -504,6 +597,39 @@ class Codegen {
 		if (ctx.drilled && s.includes('eval-'))
 			return this.evalExpr(s.replace('eval-', ''), ctx, s);
 
+		/*
+			Relative trait refs ("./x") resolve against the containing FILE — and
+			this string is moving from the host JSON into actions/<name>.js, one
+			folder down. Rewrite to the absolute @ensemble form (existence-gated,
+			exactly like trait-prepare does when content changes folders).
+		*/
+		if (/^\.\/[^\s'"`<>|]+$/.test(s) && this.traitResolver && this.ensembles.length) {
+			const abs = this.traitResolver(s);
+			if (abs) {
+				const normAbs = String(abs).replace(/\\/g, '/').replace(/\.json$/i, '');
+				const e = this.ensembles.find(x => normAbs.startsWith(x.root + '/'));
+				if (e)
+					return JSON.stringify(`@${e.name}/${normAbs.slice(e.root.length + 1)}`);
+			}
+		}
+
+		//Trait-prp wildcards. Spread form splices ARRAYS into the parent — not
+		// expressible as a config param; fail closed.
+		if (/[%$]\.\.\./.test(s))
+			throw new SkipScript('spread trait-prp wildcard ($...x$)');
+
+		//Whole-value wildcard: $x$ passes the EXACT value (objects intact), %x%
+		// string-coerces (arrays join(' ')); undefined prps keep the raw text.
+		if (WILDCARD_WHOLE.test(s)) {
+			const p = this.traitParamExpr(s);
+			if (s[0] === '$') {
+				this.helper('__wval');
+				return `__wval(${p}, ${JSON.stringify(s)})`;
+			}
+			this.helper('__wjoin');
+			return `__wjoin(${p}, ${JSON.stringify(s)})`;
+		}
+
 		const spans = this.findAccessorSpans(s);
 
 		if (spans.length === 1 && spans[0].open === '{{' && spans[0].start === 0 && spans[0].end === s.length) {
@@ -513,46 +639,39 @@ class Codegen {
 		}
 
 		if (spans.length === 0) {
-			if (new RegExp(`^${SCOPED_TOKEN.source}$`).test(s)) {
+			if (new RegExp(`^${SCOPED_TOKEN.source}$`).test(s) && !hasWildcard(s)) {
 				this.use('resolveId');
 				return `resolveId(${JSON.stringify(s)})`;
 			}
-			if (SCOPED_TOKEN.test(s)) {
+			SCOPED_TOKEN.lastIndex = 0;
+			if (SCOPED_TOKEN.test(s) || hasWildcard(s)) {
 				SCOPED_TOKEN.lastIndex = 0;
-				this.use('resolveId');
-				const replaced = s.replace(/[`\\$]/g, x => '\\' + x)
-					.replace(SCOPED_TOKEN, m => '${resolveId(' + JSON.stringify(m.replace(/\\([`\\$])/g, '$1')) + ')}');
-				return '`' + replaced + '`';
+				return '`' + this.litSegment(s) + '`';
 			}
 			return JSON.stringify(s);
 		}
 
-		//Literal text segments: escape AND resolve ||…|| tokens (fixScopeIds ran
-		// over the raw string at morph time). Spliced ${…} expressions are NEVER
-		// post-processed — their internal "||…||" string literals resolve at call
-		// time via the interface, and rewriting them corrupts the emitted JS
-		// (getExternalState("${resolveId(…)}") — a ${…} inside a normal string).
-		const lit = x => x.replace(/[`\\$]/g, c => '\\' + c).replace(SCOPED_TOKEN, m => {
-			this.use('resolveId');
-			return '${resolveId(' + JSON.stringify(m.replace(/\\([`\\$])/g, '$1')) + ')}';
-		});
-
+		//Literal text segments: escape, resolve ||…|| tokens (fixScopeIds ran over
+		// the raw string at morph time) and splice trait-prp wildcard params.
+		// Spliced ${…} expressions are NEVER post-processed — their internal
+		// "||…||" string literals resolve at call time via the interface, and
+		// rewriting them corrupts the emitted JS.
 		let tpl = '';
 		let pos = 0;
 		for (const sp of spans) {
 			const spanText = s.slice(sp.start, sp.end);
 			const expr = this.accessorExpr(sp.inner, ctx, spanText) ?? this.rowParamExpr(sp, spanText);
 			if (expr === null) {
-				tpl += lit(s.slice(pos, sp.start));
+				tpl += this.litSegment(s.slice(pos, sp.start));
 				tpl += this.retainedSpanTpl(spanText, ctx);
 				pos = sp.end;
 				continue;
 			}
-			tpl += lit(s.slice(pos, sp.start));
+			tpl += this.litSegment(s.slice(pos, sp.start));
 			tpl += sp.open === '{{' ? '${JSON.stringify(' + expr + ')}' : '${' + expr + '}';
 			pos = sp.end;
 		}
-		tpl += lit(s.slice(pos));
+		tpl += this.litSegment(s.slice(pos));
 
 		return '`' + tpl + '`';
 	}
@@ -569,12 +688,10 @@ class Codegen {
 	*/
 	retainedSpanTpl (text, ctx) {
 		//Literal chunks of retained accessor text still get their ||…|| tokens
-		// resolved (the engine's fixScopeIds ran over the whole raw string) —
-		// but spliced ${…} expressions are never touched.
-		const esc = x => x.replace(/[`\\$]/g, c => '\\' + c).replace(SCOPED_TOKEN, m => {
-			this.use('resolveId');
-			return '${resolveId(' + JSON.stringify(m.replace(/\\([`\\$])/g, '$1')) + ')}';
-		});
+		// resolved and their trait-prp wildcards spliced (the engine's text
+		// substitutions ran over the whole raw string) — but spliced ${…}
+		// expressions are never touched.
+		const esc = x => this.litSegment(x);
 		const inner = text.slice(2, -2);
 		const spans = this.findAccessorSpans(inner);
 		if (!spans.length)
@@ -623,6 +740,10 @@ class Codegen {
 			}
 
 			const parts = Object.entries(v).map(([k, val]) => {
+				//Wildcard OBJECT KEYS get renamed by the trait engine — a static
+				// object literal can't express that; fail closed.
+				if (hasWildcard(k))
+					throw new SkipScript(`trait-prp wildcard in object key: ${k}`);
 				let key = k;
 				let childCtx = ctx;
 				if (k[0] === '^') {
@@ -679,6 +800,8 @@ class Codegen {
 		for (const [k, val] of Object.entries(action)) {
 			if (skip.has(k))
 				continue;
+			if (hasWildcard(k))
+				throw new SkipScript(`trait-prp wildcard in config key: ${k}`);
 			const drilled = typeof val === 'string' || caret.includes(k);
 			const keyOut = JS_IDENT.test(k) ? k : JSON.stringify(k);
 			parts.push(`${keyOut}: ${this.valueExpr(val, { ...ctx, drilled })}`);
@@ -938,6 +1061,18 @@ class Codegen {
 		}
 		if (bodyLines === null)
 			return null;
+
+		/*
+			Eval ride-along: the engine morphs EVERY config key before running an
+			action, so a "{{eval.…}}" string under a key the action never reads
+			still EXECUTES as a side effect of morphing (the deleteVariable+eval
+			pattern in l2_grid's virtualizers). Native generators read only their
+			own keys — replicate the evaluation before the action body.
+		*/
+		if (typeof action.eval === 'string' && action.eval.includes('{{eval')) {
+			const sideEffect = this.stringExpr(action.eval, { ...actx, drilled: true });
+			bodyLines.unshift(`${indent}${sideEffect};`);
+		}
 
 		const makePost = expr => {
 			const out = [];
@@ -1661,7 +1796,13 @@ const generateScript = ({ scriptId, actions, traitResolver, ensembles, syncVars 
 		? Object.fromEntries([...gen.rowParams].map(([span, name]) => [name, span]))
 		: null;
 
-	return { code, stats: gen.stats, rowParams };
+	//Trait-prp wildcards: same idea via __traitParams — the trait engine
+	// substitutes the verbatim spans per application.
+	const traitParams = gen.traitParams.size
+		? Object.fromEntries([...gen.traitParams].map(([span, name]) => [name, span]))
+		: null;
+
+	return { code, stats: gen.stats, rowParams, traitParams };
 };
 
 module.exports = { generateScript, NATIVE_TYPES };

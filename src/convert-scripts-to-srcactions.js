@@ -215,14 +215,13 @@ const convertScript = (script, kind, file, fallbackBase) => {
 	if (pointFix)
 		actions = pointFix.apply(actions);
 
-	//Scripts inside trait bodies can use %traitPrp%/$traitPrp$ wildcards that get
-	// substituted at trait-application time — a static JS file cannot receive
-	// per-application values, so these must stay declarative.
+	//Trait-prp wildcards (%x%/$x$) convert via __traitParams: the codegen
+	// extracts each span verbatim into the emitted action config, where the
+	// trait engine keeps substituting it per application, and the JS reads
+	// config.__traitParams.<name>. Unsupported shapes (wildcard object keys,
+	// $...x$ spreads, wildcards inside accessor grammar) fail closed in the
+	// codegen and the script stays declarative.
 	const raw = JSON.stringify(actions);
-	if (/%[A-Za-z_][\w.]*%/.test(raw) || /\$[A-Za-z_][\w.]*\$/.test(raw)) {
-		skipped.push({ file: file.relPath, kind, scriptId: script.id ?? null, reason: 'uses trait-prp wildcards (%…%/$…$) — substituted at trait-application time' });
-		return false;
-	}
 
 	//Repeater rowMda placeholders (((rowData.x)) etc.) are supported via
 	// __rowParams (the codegen extracts each span into the action config, where
@@ -277,15 +276,18 @@ const convertScript = (script, kind, file, fallbackBase) => {
 	generatedFiles++;
 
 	delete script.actions;
-	if (res.rowParams) {
-		//Repeater placeholders must STAY in the JSON (the repeater's per-row clone
-		// substitutes them), so the script becomes an action-level srcAction whose
-		// __rowParams config carries the verbatim spans — the generated JS reads
-		// the substituted values from config.__rowParams at run time.
-		script.actions = [{
-			srcAction: `./actions/${name}`,
-			__rowParams: res.rowParams
-		}];
+	if (res.rowParams || res.traitParams) {
+		//Substituted placeholders must STAY in the JSON (the repeater's per-row
+		// clone / the trait engine's per-application pass rewrite them), so the
+		// script becomes an action-level srcAction whose __rowParams/__traitParams
+		// config carries the verbatim spans — the generated JS reads the
+		// substituted values from config at run time.
+		const entry = { srcAction: `./actions/${name}` };
+		if (res.rowParams)
+			entry.__rowParams = res.rowParams;
+		if (res.traitParams)
+			entry.__traitParams = res.traitParams;
+		script.actions = [entry];
 	} else
 		script.srcActions = `./actions/${name}`;
 
@@ -298,6 +300,7 @@ const convertScript = (script, kind, file, fallbackBase) => {
 		delegated: res.stats.delegated,
 		morphFallbacks: res.stats.morphFallbacks,
 		rowParams: res.rowParams ? Object.keys(res.rowParams).length : undefined,
+		traitParams: res.traitParams ? Object.keys(res.traitParams).length : undefined,
 		pointFix: pointFix?.note,
 		linesBefore: declarativeLines,
 		linesAfter: res.code.split('\n').length

@@ -1,0 +1,1688 @@
+
+############ cleanup-suite (APPLY) ############
+Cleared output/ from the previous run.
+Mutating the workspace. Revert = git reset --hard in every ensemble + legoz.
+
+
+######## Pass 1 ########
+
+======== [pass 1] [baseline] Record pre-existing reference issues ========
+Baseline updated: 54 known issue(s) recorded in D:\development\intenda\codex projects\legoz-workspace\tools\opus-ui-app-cleaner\output\check-refs-baseline.json
+
+======== [pass 1] [unused] Unused-file analysis ========
+Entrypoints: D:\development\intenda\codex projects\legoz-workspace\tools\opus-ui-app-cleaner\entrypoints.sample.txt
+
+================ Unused JSON summary ================
+
+  l2_dashboards                 3434 json    806 unused    112 dead-end roots
+  l2_buttons                      17 json      3 unused      3 dead-end roots
+  l2_confirmation_panel            1 json      0 unused      0 dead-end roots
+  l2_context_menu                  2 json      0 unused      0 dead-end roots
+  l2_date_picker                  21 json      0 unused      0 dead-end roots
+  l2_grid                        100 json      5 unused      4 dead-end roots
+  l2_inputs                       51 json      8 unused      8 dead-end roots
+  l2_menu_tree                    33 json      1 unused      1 dead-end roots
+  l2_modal_panel                   4 json      0 unused      0 dead-end roots
+  l2_page_action_bar               1 json      0 unused      0 dead-end roots
+  l2_shell                        84 json      2 unused      2 dead-end roots
+  l2_tab_manager                  10 json      0 unused      0 dead-end roots
+  l2_topbar                       25 json      0 unused      0 dead-end roots
+  l2_util                          6 json      2 unused      1 dead-end roots
+  l2_session_expiry_checker        7 json      0 unused      0 dead-end roots
+  l2_ontology                   2275 json    987 unused    103 dead-end roots
+  (app)                           22 json      2 unused      1 dead-end roots
+
+  TOTAL: 6093 JSON files, 4277 used, 1816 unused (235 dead-end roots)
+  A "dead-end root" is an unused file no other unused file references — review these;
+  the rest of the unused files hang off them as descendants.
+  Unresolved references: 7 (likely typos or deleted files)
+  Dynamic references:    2 (contain %prp%/{state} — not statically resolvable)
+
+  Report:     D:\development\intenda\codex projects\legoz-workspace\tools\opus-ui-app-cleaner\output\unused-report.json
+  Flat list:  D:\development\intenda\codex projects\legoz-workspace\tools\opus-ui-app-cleaner\output\unused-files.txt
+  Roots only: D:\development\intenda\codex projects\legoz-workspace\tools\opus-ui-app-cleaner\output\unused-roots.txt
+
+  Tip: node index.js --explain=<workspace-relative-path> shows why a file is considered used.
+
+
+======== [pass 1] [delete] Move unused JSON out of the workspace ========
+
+1816 file(s) moved to D:\development\intenda\codex projects\legoz-workspace\tools\opus-ui-app-cleaner\output\deleted-files
+
+Restore everything with: node undelete-files.js
+
+======== [pass 1] [acceptprps] Strip unused acceptPrps ========
+
+Removing unused acceptPrps from 172 files:
+
+  l2_buttons/visual/text/index.json  (whole file reformatted to tab-indented JSON)
+      removed: dir
+  l2_dashboards/component_list/grid/functional/dataManager/index.json
+      removed: hasAutoRefresh
+  l2_dashboards/home/pieChart/index.json  (whole file reformatted to tab-indented JSON)
+      removed: data
+  l2_dashboards/home/publicationStatusGrid/firstCell.json
+      removed: title, columnIndex, canResizeColumns, virtualize, customHeaderCellTraitPrps
+  l2_dashboards/home/tasks.json
+      removed: requests
+  l2_dashboards/l2_canvas_shared/canvas/tabManager/tabContents/canvasUnion/unionFields/dataObjectHeader/field/index.json  (whole file reformatted to tab-indented JSON)
+      removed: tab_type, dta_typ_cde, hid_out, OBMode
+  l2_dashboards/l2_canvas_shared/canvas/tabManager/tabContents/canvasView/dataObjectHeader/field/index.json  (whole file reformatted to tab-indented JSON)
+      removed: tab_type, dta_typ_cde, hid_out
+  l2_dashboards/l2_canvas_shared/canvas/tabManager/tabContents/shared/objectWorkspace/workspaceContainer/workspaceHeadersContainer/functional/actions/deselectField.json
+      removed: isSelected
+  l2_dashboards/l2_data_connectors/dataConnectionConfiguration/container/tabContainer/securityTab/securityGrid/functional/dataManager/index.json
+      removed: hasAutoRefresh
+  l2_dashboards/l2_data_connectors/dataConnectionConfiguration/container/tabContainer/securityTab/securityGrid/functional/modifiedRecordsManager/functional/onModifiedRecordsChanged.json
+      removed: tableKey, actionKey
+  l2_dashboards/l2_data_connectors/reskin/parameterTypesTab/parameterTypesGrid/functional/modifiedRecordsManager/functional/onModifiedRecordsChanged.json
+      removed: tableKey, actionKey
+  l2_dashboards/l2_data_objects/panels/dataObjectConfigurationPanel/container/tabContainer/permissionsTab/grid/grid/permissionsTabCheckbox/index.json
+      removed: autoSave
+  l2_dashboards/l2_data_pedigree/calculatedField/calculatedFieldLine/index.json
+      removed: field
+  l2_dashboards/l2_data_pedigree/header/index.json
+      removed: filterId
+  l2_dashboards/l2_data_pedigree/headerOptimized/index.json
+      removed: filterId
+  l2_dashboards/l2_data_sources/dataSourceGrid/pushdownCell.json
+      removed: autoSave
+  l2_dashboards/l2_data_sources/dataSourceGrid/viewOnlyCell.json
+      removed: autoSave
+  l2_dashboards/l2_entities/entitiesGrid/dataSourceHeaderCell/index.json
+      removed: columnIndex, gridId, canResizeColumns, virtualize
+  l2_dashboards/l2_entities/entityAttributesPanel/attributesGrid/grid/functional/dataManager/index.json
+      removed: tableKey
+  l2_dashboards/l2_entities/entityRelationshipsPanel/relationshipsGrid/grid/functional/dataManager/index.json
+      removed: tableKey
+  l2_dashboards/l2_object_builder/panels/dataObjectFieldCalculationPanel/calculationBuilderContainer/calculationEntryWgt/functional/setInitialBackground.json
+      removed: data
+  l2_dashboards/l2_object_builder/panels/dataObjectFieldsPanel/dataObjectFieldsGrid/functional/actions/deleteSelectedFields.json
+      removed: DOFieldsToDeleteCodes
+  l2_dashboards/l2_object_builder/panels/dataObjectFieldTagsPanel/toolbar/functional/actions/defaultTraitToCallOnClickApply.json
+      removed: scriptId
+  l2_dashboards/l2_object_builder/panels/moreInfoPanel/container/compare/firstCompareGrid/functional/attributeGridManager/functional/refreshGridOnHedCdeChange.json
+      removed: gridId
+  l2_dashboards/l2_object_builder/panels/moreInfoPanel/container/compare/firstCompareGrid/functional/dataOwnersGridManager/functional/refreshGridOnHedCdeChange.json
+      removed: gridId
+  l2_dashboards/l2_object_builder/panels/moreInfoPanel/container/compare/firstCompareGrid/functional/dataSourceGridManager/functional/refreshGridOnHedCdeChange.json
+      removed: gridId
+  l2_dashboards/l2_object_builder/panels/moreInfoPanel/container/compare/firstCompareGrid/functional/fieldsGridDataManager/functional/refreshGridOnHedCdeChange.json
+      removed: gridId
+  l2_dashboards/l2_object_builder/panels/moreInfoPanel/container/compare/firstCompareGrid/functional/permissionsDataManager/functional/refreshGridOnHedCdeChange.json
+      removed: gridId
+  l2_dashboards/l2_object_builder/panels/moreInfoPanel/container/compare/firstCompareGrid/functional/relationshipsGridManager/functional/refreshGridOnHedCdeChange.json
+      removed: gridId
+  l2_dashboards/l2_object_builder/panels/moreInfoPanel/container/compare/firstCompareGrid/functional/rowFilterGridDataManager/functional/refreshGridOnHedCdeChange.json
+      removed: gridId
+  l2_dashboards/l2_object_builder/panels/moreInfoPanel/container/compare/functional/matchFiltersAcrossGrids/functional/matchFilter.json
+      removed: isDropdown
+  l2_dashboards/l2_object_builder/panels/moreInfoPanel/container/compare/secondCompareGrid/functional/attributeGridManager/functional/refreshGridOnHedCdeChange.json
+      removed: gridId
+  l2_dashboards/l2_object_builder/panels/moreInfoPanel/container/compare/secondCompareGrid/functional/dataOwnersGridManager/functional/refreshGridOnHedCdeChange.json
+      removed: gridId
+  l2_dashboards/l2_object_builder/panels/moreInfoPanel/container/compare/secondCompareGrid/functional/dataSourceGridManager/functional/refreshGridOnHedCdeChange.json
+      removed: gridId
+  l2_dashboards/l2_object_builder/panels/moreInfoPanel/container/compare/secondCompareGrid/functional/fieldsGridDataManager/functional/refreshGridOnHedCdeChange.json
+      removed: gridId
+  l2_dashboards/l2_object_builder/panels/moreInfoPanel/container/compare/secondCompareGrid/functional/permissionsDataManager/functional/refreshGridOnHedCdeChange.json
+      removed: gridId
+  l2_dashboards/l2_object_builder/panels/moreInfoPanel/container/compare/secondCompareGrid/functional/relationshipsGridManager/functional/refreshGridOnHedCdeChange.json
+      removed: gridId
+  l2_dashboards/l2_object_builder/panels/moreInfoPanel/container/compare/secondCompareGrid/functional/rowFilterGridDataManager/functional/refreshGridOnHedCdeChange.json
+      removed: gridId
+  l2_dashboards/l2_object_builder/panels/moreInfoPanel/container/history/functional/attributeGridManager/functional/refreshGridOnHedCdeChange.json
+      removed: gridId
+  l2_dashboards/l2_object_builder/panels/moreInfoPanel/container/history/functional/dataOwnerGridManager/functional/refreshGridOnHedCdeChange.json
+      removed: gridId
+  l2_dashboards/l2_object_builder/panels/moreInfoPanel/container/history/functional/fieldsGridDataManager/functional/refreshGridOnHedCdeChange.json
+      removed: gridId
+  l2_dashboards/l2_object_builder/panels/moreInfoPanel/container/history/functional/permissionsDataManager/functional/refreshGridOnHedCdeChange.json
+      removed: gridId
+  l2_dashboards/l2_object_builder/panels/moreInfoPanel/container/history/functional/relationshipsGridManager/functional/refreshGridOnHedCdeChange.json
+      removed: gridId
+  l2_dashboards/l2_object_builder/panels/moreInfoPanel/container/history/functional/rowFilterGridDataManager/functional/refreshGridOnHedCdeChange.json
+      removed: gridId
+  l2_dashboards/l2_object_builder/panels/relationshipsPanel/gridContainer/grid/functional/dataManager/index.json
+      removed: tableKey
+  l2_dashboards/l2_object_builder/panels/runPanel/functional/actions/generateColumnConfig.json
+      removed: scriptId
+  l2_dashboards/l2_organisation_management/reskin/rolesGrid/roleGrid/functional/dataManager/index.json
+      removed: dataManagerPreFilters
+  l2_dashboards/l2_organisation_management/reskin/rolesGrid/roleGrid/roleTypeCell.json
+      removed: columnConfig, columnCellIndex, typeKey
+  l2_dashboards/l2_role_management/menuAccessPanel/container/menuStructure/treeView/sectionItem/index.json
+      removed: type, prc_sec_id, name, vis, ena, functions, treeWidth
+  l2_dashboards/l2_role_management/reskin/organisationsGrid/menuAccessPanel/container/menuStructure/treeView/sectionItem/index.json
+      removed: type, prc_sec_id, name, vis, ena, functions, treeWidth
+  l2_dashboards/l2_role_management/reskin/organisationsGrid/roleGrid/functional/dataManager/index.json
+      removed: dataManagerPreFilters
+  l2_dashboards/l2_user_management/reskin/rolesGrid/container/roleRoleTypeLinker/availableRoleTypeContainer/row/onAddRow.json
+      removed: code
+  l2_dashboards/overrides/l2_grid/index.json
+      removed: pageSize, traitReorderedRecordsManager
+  l2_dashboards/reskin/explorers/downloadCentre/toolbar.json
+      removed: parentId
+  l2_dashboards/reskin/explorers/objectLibrary/contextMenu/dataObjects/folderContextMenu.json
+      removed: rowId, rowName, list_identifier
+  l2_dashboards/reskin/explorers/objectLibrary/contextMenu/pendingApproval/requestToPublishDataObjectContextMenu.json
+      removed: nodeId, parentNodeId, rowId, rowName, list_identifier
+  l2_dashboards/reskin/explorers/objectLibrary/contextMenu/workspaces/folderContextMenu.json
+      removed: nodeId, parentNodeId, rowId, rowName, list_identifier
+  l2_dashboards/reskin/explorers/objectLibrary/contextMenu/workspaces/workspaceDataObjectContextMenu.json
+      removed: nodeId, parentNodeId, rowId, rowName, list_identifier
+  l2_dashboards/reskin/explorers/objectLibrary/toolbar.json
+      removed: parentId
+  l2_dashboards/reskin/explorers/systemAdministration/createEditDataConnectorPanel/container/properties/toolbar/functional/onClickSave.json
+      removed: openTabId
+  l2_dashboards/reskin/explorers/systemAdministration/createEditOrganisationPanel/toolbar/createToolbar.json
+      removed: parentScope
+  l2_dashboards/reskin/explorers/systemAdministration/toolbar.json
+      removed: parentId
+  l2_dashboards/reskin/explorers/systemAdministration/virtualizedExplorer/entry.json
+      removed: entry, isExpanded
+  l2_dashboards/reskin/pageCachedObjects/cachedObjectsGrid/toolbar.json
+      removed: canUpdateGrid
+  l2_dashboards/reskin/pageCompareDOs/container/firstCompareGrid/functional/attributeGridManager/functional/refreshGridOnHedCdeChange.json
+      removed: gridId
+  l2_dashboards/reskin/pageCompareDOs/container/firstCompareGrid/functional/dataOwnersGridManager/functional/refreshGridOnHedCdeChange.json
+      removed: gridId
+  l2_dashboards/reskin/pageCompareDOs/container/firstCompareGrid/functional/dataSourceGridManager/functional/refreshGridOnHedCdeChange.json
+      removed: gridId
+  l2_dashboards/reskin/pageCompareDOs/container/firstCompareGrid/functional/fieldsGridDataManager/functional/refreshGridOnHedCdeChange.json
+      removed: gridId
+  l2_dashboards/reskin/pageCompareDOs/container/firstCompareGrid/functional/permissionsDataManager/functional/refreshGridOnHedCdeChange.json
+      removed: gridId
+  l2_dashboards/reskin/pageCompareDOs/container/firstCompareGrid/functional/relationshipsGridManager/functional/refreshGridOnHedCdeChange.json
+      removed: gridId
+  l2_dashboards/reskin/pageCompareDOs/container/firstCompareGrid/functional/rowFilterGridDataManager/functional/refreshGridOnHedCdeChange.json
+      removed: gridId
+  l2_dashboards/reskin/pageCompareDOs/container/functional/matchFiltersAcrossGrids/functional/matchFilter.json
+      removed: isDropdown
+  l2_dashboards/reskin/pageCompareDOs/container/secondCompareGrid/functional/attributeGridManager/functional/refreshGridOnHedCdeChange.json
+      removed: gridId
+  l2_dashboards/reskin/pageCompareDOs/container/secondCompareGrid/functional/dataOwnersGridManager/functional/refreshGridOnHedCdeChange.json
+      removed: gridId
+  l2_dashboards/reskin/pageCompareDOs/container/secondCompareGrid/functional/dataSourceGridManager/functional/refreshGridOnHedCdeChange.json
+      removed: gridId
+  l2_dashboards/reskin/pageCompareDOs/container/secondCompareGrid/functional/fieldsGridDataManager/functional/refreshGridOnHedCdeChange.json
+      removed: gridId
+  l2_dashboards/reskin/pageCompareDOs/container/secondCompareGrid/functional/permissionsDataManager/functional/refreshGridOnHedCdeChange.json
+      removed: gridId
+  l2_dashboards/reskin/pageCompareDOs/container/secondCompareGrid/functional/relationshipsGridManager/functional/refreshGridOnHedCdeChange.json
+      removed: gridId
+  l2_dashboards/reskin/pageCompareDOs/container/secondCompareGrid/functional/rowFilterGridDataManager/functional/refreshGridOnHedCdeChange.json
+      removed: gridId
+  l2_dashboards/reskin/pageCompareDOs/index.json
+      removed: tabId, tabType
+  l2_dashboards/reskin/pageDataObject/DOCaching/DOCacheDetails/partitionsGridValueCell.json
+      removed: autoSave, cellId, columnCellValue, isReadColumn
+  l2_dashboards/reskin/pageDataObject/DOFields/dataObjectFieldCalculationPanel/calculationBuilderContainer/calculationEntryWgt/functional/setInitialBackground.json
+      removed: data
+  l2_dashboards/reskin/pageDataObject/DOFields/dataObjectFieldCalculationPanel/calculationBuilderContainer/fieldsList/repeaterList/sectionList/functional/onClickListItem.json
+      removed: label
+  l2_dashboards/reskin/pageDataObject/DOFields/grid/aliasCell.json  (whole file reformatted to tab-indented JSON)
+      removed: columnCellConfig
+  l2_dashboards/reskin/pageDataObject/DOPermissions/permissionsTabCheckbox.json
+      removed: autoSave
+  l2_dashboards/reskin/pageDataSource/index.json
+      removed: mode
+  l2_dashboards/reskin/pageDistributedObject/index.json
+      removed: sch_cde
+  l2_dashboards/reskin/pageDistributionSchedules/distributionSchedulesGrid/toolbar.json
+      removed: canUpdateGrid
+  l2_dashboards/reskin/panels/DataSources/createEditDataSourcePanel/form/dataSourceTypeBubble.json
+      removed: type
+  l2_dashboards/reskin/panels/DataSources/createEditDataSourcePanel/toolbar/index.json  (whole file reformatted to tab-indented JSON)
+      removed: parentScope
+  l2_dashboards/reskin/panels/DORunPanel/functional/actions/generateColumnConfig.json
+      removed: scriptId
+  l2_dashboards/reskin/shared/grid/actionCell.json
+      removed: extraPrpsIcon
+  l2_dashboards/reskin/shared/grid/archivedCell.json
+      removed: cellId, columnConfig, columnCellValue, columnCellHeight
+  l2_dashboards/reskin/shared/grid/iconHeaderCell.json
+      removed: title, columnIndex, columnConfig, cellId, gridId, canResizeColumns, virtualize
+  l2_date_picker/visual/datePickerToggler/index.json
+      removed: dateString
+  l2_grid/visual/bodyCells/functional/moveCellOnReorder.json
+      removed: columnName
+  l2_grid/visual/bodyCells/visual/actionCell/index.json  (whole file reformatted to tab-indented JSON)
+      removed: columnCellConfig
+  l2_grid/visual/bodyCells/visual/columnCellNoEdit/index.json  (whole file reformatted to tab-indented JSON)
+      removed: columnCellConfig
+  l2_grid/visual/headerCells/visual/actionHeaderCell/default/index.json  (whole file reformatted to tab-indented JSON)
+      removed: columnIndex
+  l2_grid/visual/headerCells/visual/actionHeaderCell/index.json  (whole file reformatted to tab-indented JSON)
+      removed: title, columnIndex, canFilter
+  l2_grid/visual/headerCells/visual/headerCell/index.json  (whole file reformatted to tab-indented JSON)
+      removed: columnIndex
+  l2_ontology/explorer/changelog/configurationPanel/form/visual/changeLogRejectButton.json  (whole file reformatted to tab-indented JSON)
+      removed: savedIdsLocation, fromConceptId
+  l2_ontology/explorer/dataModels/linkAttributeToTermPanel/form/grid/visual/actionColumn.json  (whole file reformatted to tab-indented JSON)
+      removed: theData
+  l2_ontology/explorer/dataModels/manualConnectEntityPanel/form/functional/buildAttributeMappings.json  (whole file reformatted to tab-indented JSON)
+      removed: attributeCode, selectedSourceValue
+  l2_ontology/explorer/dataModels/manualConnectEntityPanel/form/visual/attributeAndMatchEntry.json  (whole file reformatted to tab-indented JSON)
+      removed: attributeCode
+  l2_ontology/explorer/dataModels/viewDataPipelineResultsPanel/form/visual/cards/card.json
+      removed: title
+  l2_ontology/explorer/dataModels/viewDataPipelineResultsPanel/form/visual/cards/cardTitle.json  (whole file reformatted to tab-indented JSON)
+      removed: menuItems
+  l2_ontology/explorer/dataModels/viewDataPipelineResultsPanel/form/visual/grids/gridFull/visual/categoriesColumn.json  (whole file reformatted to tab-indented JSON)
+      removed: cellId, columnConfig
+  l2_ontology/explorer/dataModels/viewDataPipelineResultsPanel/form/visual/grids/gridSingle/visual/dataQualityColumn.json
+      removed: cellId, columnConfig
+  l2_ontology/explorer/dataModels/viewDataPipelineResultsPanel/form/visual/grids/gridSingle/visual/percentageChip/index.json  (whole file reformatted to tab-indented JSON)
+      removed: columnName, ruleName, attributeId, ruleId
+  l2_ontology/explorer/dataModels/viewDataPipelineResultsPanel/form/visual/grids/gridSingle/visual/rulePercentagesColumn.json
+      removed: cellId, columnConfig, columnCellValue
+  l2_ontology/explorer/domain/bulkAddExtendedPropertySetsPanel/form/visual/availablePropertiesGrid/visual/actionColumn.json  (whole file reformatted to tab-indented JSON)
+      removed: theData
+  l2_ontology/explorer/domain/bulkAddExtendedPropertySetsPanel/form/visual/availablePropertiesGrid/visual/infoColumn.json  (whole file reformatted to tab-indented JSON)
+      removed: theData
+  l2_ontology/explorer/domain/linkExtendedPropertiesTermPanel/form/visual/availablePropertiesGrid/visual/actionColumn.json  (whole file reformatted to tab-indented JSON)
+      removed: theData
+  l2_ontology/explorer/domain/linkExtendedPropertiesTermPanel/form/visual/linkedPropertiesGrid/visual/actionColumn.json  (whole file reformatted to tab-indented JSON)
+      removed: theData
+  l2_ontology/explorer/domain/linkRulesTermPanel/form/visual/availableRulesGrid/visual/actionColumn.json  (whole file reformatted to tab-indented JSON)
+      removed: theData
+  l2_ontology/explorer/domain/linkRulesTermPanel/form/visual/linkedRulesGrid/visual/actionColumn.json  (whole file reformatted to tab-indented JSON)
+      removed: theData
+  l2_ontology/explorer/term/addExtendedPropertySetPanel/form/visual/availablePropertiesGrid/visual/actionColumn.json  (whole file reformatted to tab-indented JSON)
+      removed: theData
+  l2_ontology/explorer/term/addExtendedPropertySetPanel/form/visual/availablePropertiesGrid/visual/infoColumn.json  (whole file reformatted to tab-indented JSON)
+      removed: theData
+  l2_ontology/explorer/toolbar.json
+      removed: parentId
+  l2_ontology/explorer/virtualizedExplorer/entry.json  (whole file reformatted to tab-indented JSON)
+      removed: entry, isExpanded
+  l2_ontology/reskin/changeLog/visual/grid/visual/statusHeaderCell.json  (whole file reformatted to tab-indented JSON)
+      removed: columnConfig
+  l2_ontology/reskin/config/extendedProperties/visual/grid/visual/actionColumn.json  (whole file reformatted to tab-indented JSON)
+      removed: theData
+  l2_ontology/reskin/config/extendedProperties/visual/grid/visual/propertiesInSetColumn.json  (whole file reformatted to tab-indented JSON)
+      removed: value
+  l2_ontology/reskin/config/extendedPropertySets/visual/grid/visual/actionColumn.json  (whole file reformatted to tab-indented JSON)
+      removed: theData
+  l2_ontology/reskin/config/extendedPropertySets/visual/grid/visual/propertiesInSetColumn.json  (whole file reformatted to tab-indented JSON)
+      removed: value
+  l2_ontology/reskin/config/individualProperty/functional/publishProperty.json  (whole file reformatted to tab-indented JSON)
+      removed: propertyId
+  l2_ontology/reskin/config/referenceLists/visual/grid/visual/actionColumn.json  (whole file reformatted to tab-indented JSON)
+      removed: theData
+  l2_ontology/reskin/config/referenceLists/visual/properties/grid/functional/updateReferenceValues.json  (whole file reformatted to tab-indented JSON)
+      removed: name, description
+  l2_ontology/reskin/config/referenceLists/visual/properties/grid/visual/deleteActionColumn.json  (whole file reformatted to tab-indented JSON)
+      removed: theData
+  l2_ontology/reskin/config/workflowTemplates/visual/editMode/visual/configurationSection/triggerActionBlocks/visual/actions/visual/action.json  (whole file reformatted to tab-indented JSON)
+      removed: indexArray
+  l2_ontology/reskin/config/workflowTemplates/visual/editMode/visual/configurationSection/triggerActionBlocks/visual/actions/visual/group.json  (whole file reformatted to tab-indented JSON)
+      removed: indexArray
+  l2_ontology/reskin/config/workflowTemplates/visual/editMode/visual/configurationSection/triggerActionBlocks/visual/triggers/visual/group.json  (whole file reformatted to tab-indented JSON)
+      removed: indexArray
+  l2_ontology/reskin/config/workflowTemplates/visual/editMode/visual/configurationSection/triggerActionBlocks/visual/triggers/visual/trigger.json  (whole file reformatted to tab-indented JSON)
+      removed: indexArray
+  l2_ontology/reskin/config/workflowTemplates/visual/grid/visual/actionColumn.json  (whole file reformatted to tab-indented JSON)
+      removed: theData
+  l2_ontology/reskin/dataModels/visual/tabs/canvas/visual/canvasConnectionMode/canvas/functional/showVersionOutdated.json  (whole file reformatted to tab-indented JSON)
+      removed: parentId, outdatedPopupScope
+  l2_ontology/reskin/dataModels/visual/tabs/canvas/visual/canvasConnectionMode/details/activityCenter/dataPipelineTab/visual/grid/visual/actionColumn.json  (whole file reformatted to tab-indented JSON)
+      removed: theData
+  l2_ontology/reskin/dataModels/visual/tabs/canvas/visual/canvasConnectionMode/details/activityCenter/materializationTab/visual/grid/visual/actionColumn.json  (whole file reformatted to tab-indented JSON)
+      removed: theData
+  l2_ontology/reskin/dataModels/visual/tabs/canvas/visual/canvasConnectionMode/details/activityCenter/workflowTab/visual/grid/visual/actionColumn.json  (whole file reformatted to tab-indented JSON)
+      removed: theData
+  l2_ontology/reskin/dataModels/visual/tabs/canvas/visual/canvasEditMode/canvas/functional/showVersionOutdated.json  (whole file reformatted to tab-indented JSON)
+      removed: parentId, outdatedPopupScope
+  l2_ontology/reskin/exceptionTracker/exceptionDetails/exceptionOverview/visual/pieChartGraph/pieChart/visual/pie.json
+      removed: radius
+  l2_ontology/reskin/exceptionTracker/exceptionTrackerConfig/visual/grid/visual/actionColumn.json  (whole file reformatted to tab-indented JSON)
+      removed: theData
+  l2_ontology/reskin/exceptionTracker/exceptionTrackerConfig/visual/panels/configureAccessFiltersPanel/visual/tabBody/restrictions/visual/restrictionEntry.json  (whole file reformatted to tab-indented JSON)
+      removed: restrictionSourceId
+  l2_ontology/reskin/exceptionTracker/exceptionTrackerConfig/visual/panels/createAccessFiltersPanel/visual/tabBody/restrictions/visual/restrictionEntry.json  (whole file reformatted to tab-indented JSON)
+      removed: restrictionSourceId
+  l2_ontology/reskin/migration/dataModelMigration/visual/grid/visual/actionColumn.json
+      removed: theData
+  l2_ontology/reskin/migration/dataModelMigration/visual/profileGrid/visual/actionColumn.json
+      removed: theData
+  l2_ontology/reskin/migration/dataObjectMigration/visual/grid/visual/actionColumn.json
+      removed: theData
+  l2_ontology/reskin/migration/ontologyMigration/visual/grid/visual/actionColumn.json  (whole file reformatted to tab-indented JSON)
+      removed: theData
+  l2_ontology/reskin/migration/referenceTables/visual/grid/visual/actionColumn.json  (whole file reformatted to tab-indented JSON)
+      removed: theData
+  l2_ontology/reskin/migration/workflowMigration/visual/grid/visual/actionColumn.json
+      removed: theData
+  l2_ontology/reskin/ontologies/concepts/domains/visual/tabs/subDomains/visual/grid/visual/actionColumn.json  (whole file reformatted to tab-indented JSON)
+      removed: theData
+  l2_ontology/reskin/ontologies/concepts/domains/visual/tabs/subDomains/visual/grid/visual/termsLinkedActionColumn.json  (whole file reformatted to tab-indented JSON)
+      removed: theData
+  l2_ontology/reskin/ontologies/concepts/domains/visual/tabs/terms/grid/visual/actionColumn.json  (whole file reformatted to tab-indented JSON)
+      removed: theData
+  l2_ontology/reskin/ontologies/concepts/domains/visual/tabs/terms/grid/visual/extendedPropertiesActionColumn.json  (whole file reformatted to tab-indented JSON)
+      removed: theData
+  l2_ontology/reskin/ontologies/concepts/domains/visual/tabs/terms/grid/visual/rulesLinkedActionColumn.json  (whole file reformatted to tab-indented JSON)
+      removed: theData
+  l2_ontology/reskin/ontologies/concepts/terms/visual/tabs/extendedProperties/grid/visual/actionColumn.json  (whole file reformatted to tab-indented JSON)
+      removed: theData
+  l2_ontology/reskin/ontologies/concepts/terms/visual/tabs/rules/grid/visual/actionColumn.json  (whole file reformatted to tab-indented JSON)
+      removed: theData
+  l2_ontology/reskin/ontologies/visual/tabs/domains/visual/grid/visual/actionColumn.json  (whole file reformatted to tab-indented JSON)
+      removed: theData
+  l2_ontology/reskin/ontologies/visual/tabs/domains/visual/grid/visual/termsLinkedActionColumn.json  (whole file reformatted to tab-indented JSON)
+      removed: theData
+  l2_ontology/reskin/ontologies/visual/tabs/tags/visual/grid/visual/actionColumn.json  (whole file reformatted to tab-indented JSON)
+      removed: theData
+  l2_ontology/reskin/ontologies/visual/tabs/terms/grid/visual/actionColumn.json  (whole file reformatted to tab-indented JSON)
+      removed: theData
+  l2_ontology/reskin/ontologies/visual/tabs/terms/grid/visual/extendedPropertiesActionColumn.json  (whole file reformatted to tab-indented JSON)
+      removed: theData
+  l2_ontology/reskin/ontologies/visual/tabs/terms/grid/visual/rulesLinkedActionColumn.json  (whole file reformatted to tab-indented JSON)
+      removed: theData
+  l2_ontology/shared/button/icon.json
+      removed: dir
+  l2_ontology/shared/button/iconText.json
+      removed: dir
+  l2_ontology/shared/grid/customHeadingCell.json
+      removed: columnIndex
+  l2_ontology/shared/l2_modal/index.json
+      removed: middleIsBordered
+  l2_ontology/shared/radialChart/radialSlice.json
+      removed: radius
+  l2_tab_manager/functional/traitOnClickClosed.json  (whole file reformatted to tab-indented JSON)
+      removed: tabId
+  l2_topbar/visual/notificationsSection/visual/tasksAndActivitiesCheckbox.json  (whole file reformatted to tab-indented JSON)
+      removed: key
+  l2_topbar/visual/search/searchOverlay/functional/openObjectLibraryOnContext.json
+      removed: section, record
+  l2_util/functional/showFullTextOnHoverWithDelay.json
+      removed: margin
+
+Removed 245 props from 172 files (66 reformatted).
+Manifest: D:\development\intenda\codex projects\legoz-workspace\tools\opus-ui-app-cleaner\output\deleted-accept-prps-manifest.json
+Revert with: node delete-accept-prps.js --undo
+
+
+======== [pass 1] [collapse] Collapse passthrough wrapper traits ========
+Round 1: 1 wrapper(s) collapsible
+Round 2: 0 wrapper(s) collapsible
+
+================ Wrapper traits (APPLIED) ================
+
+  Collapsed: 1 wrapper(s) over 2 round(s)
+  Kept:      0 (menu/JS/dynamic/non-traits refs)
+    l2_dashboards/l2_data_objects/dataObjectConfigurationPanel/index.json  ->  @l2_dashboards/l2_data_objects/panels/dataObjectConfigurationPanel/index
+
+  Report: D:\development\intenda\codex projects\legoz-workspace\tools\opus-ui-app-cleaner\output\collapse-report.json
+
+======== [pass 1] [dedupe] Deduplicate identical traits ========
+
+================ Duplicate traits (APPLIED) ================
+
+  Duplicate groups:      230
+  Files removed:         387 (references repointed: 448)
+  Duplicates kept:       0 (menu/JS/dynamic references)
+
+  keep    l2_dashboards/account_management/pages/accountInfo/functional/setFormValidity.json
+  remove  l2_shell/pages/accountManagementPanel/visual/content/visual/pages/accountInfo/functional/setFormValidity.json
+
+  keep    l2_shell/pages/accountManagementPanel/visual/toolbar/functional/enableSaveButton.json
+  remove  l2_dashboards/account_management/pages/accountInfo/toolbar/functional/enableSaveButton.json
+
+  keep    l2_shell/pages/accountManagementPanel/visual/toolbar/functional/onClickSave.json
+  remove  l2_dashboards/account_management/pages/accountInfo/toolbar/functional/onClickSave.json
+
+  keep    l2_dashboards/account_management/pages/organisations/functional/fetchOrgData.json
+  remove  l2_shell/pages/accountManagementPanel/visual/content/visual/pages/organisations/functional/fetchOrgData.json
+
+  keep    l2_dashboards/account_management/pages/token/functional/onClickedCreate.json
+  remove  l2_shell/pages/accountManagementPanel/visual/content/visual/pages/token/functional/onClickedCreate.json
+
+  keep    l2_dashboards/account_management/pages/token/functional/onClickedRevoke.json
+  remove  l2_shell/pages/accountManagementPanel/visual/content/visual/pages/token/functional/onClickedRevoke.json
+
+  keep    l2_dashboards/l2_data_sources/discoveryPanel/functional/onPanelClosed.json
+  remove  l2_dashboards/reskin/panels/DODownloadMetadataPanel/functional/onPanelClosed.json
+  remove  l2_dashboards/account_management/pages/token/visual/expirationPanel/functional/onPanelClosed.json
+  remove  l2_shell/pages/accountManagementPanel/visual/content/visual/pages/token/visual/expirationPanel/functional/onPanelClosed.json
+
+  keep    l2_dashboards/account_management/pages/token/visual/expirationPanel/functional/onPanelOpened.json
+  remove  l2_shell/pages/accountManagementPanel/visual/content/visual/pages/token/visual/expirationPanel/functional/onPanelOpened.json
+
+  keep    l2_dashboards/account_management/pages/token/visual/expirationPanel/visual/toolbar/functional/onClickClose.json
+  remove  l2_shell/pages/accountManagementPanel/visual/content/visual/pages/token/visual/expirationPanel/visual/toolbar/functional/onClickClose.json
+
+  keep    l2_dashboards/account_management/pages/token/visual/tokenCreationPanel/functional/onPanelClosed.json
+  remove  l2_shell/pages/accountManagementPanel/visual/content/visual/pages/token/visual/tokenCreationPanel/functional/onPanelClosed.json
+
+  ... and 220 more groups (see dedupe-report.json)
+
+  Report: D:\development\intenda\codex projects\legoz-workspace\tools\opus-ui-app-cleaner\output\dedupe-report.json
+  Backup: D:\development\intenda\codex projects\legoz-workspace\tools\opus-ui-app-cleaner\output\dedupe-backup
+
+======== [pass 1] [traitprps] Strip dead call-site traitPrps ========
+
+================ Dead traitPrps at call sites (APPLIED) ================
+
+  Call sites with dead traitPrps: 206 (235 keys) in 171 files
+    l2_dashboards/account_management/pages/roles/index.json
+        -> @l2_dashboards/overrides/l2_grid/index: pageSize
+    l2_dashboards/account_management/pages/token/visual/tokenGrid/index.json
+        -> @l2_dashboards/overrides/l2_grid/index: pageSize
+    l2_dashboards/component_list/grid/index.json
+        -> @l2_dashboards/overrides/l2_grid/index: pageSize, autoColumnWiths
+    l2_dashboards/home/cachingGrid/index.json
+        -> @l2_dashboards/overrides/l2_grid/index: pageSize
+    l2_dashboards/home/dataImportGrid/index.json
+        -> @l2_dashboards/overrides/l2_grid/index: pageSize
+    l2_dashboards/home/discoveryStatusGrid/index.json
+        -> @l2_dashboards/overrides/l2_grid/index: pageSize
+    l2_dashboards/home/publicationStatusGrid/index.json
+        -> @l2_dashboards/overrides/l2_grid/index: pageSize
+    l2_dashboards/l2_background_jobs/publicationReportModal/publicationReportGrid/index.json
+        -> @l2_dashboards/overrides/l2_grid/index: pageSize
+    l2_dashboards/l2_background_jobs/publicationStatusGrid/index.json
+        -> @l2_dashboards/overrides/l2_grid/index: pageSize
+    l2_dashboards/l2_canvas_shared/canvas/tabManager/tabContents/shared/objectWorkspace/workspaceContainer/orderGrid/index.json
+        -> @l2_dashboards/overrides/l2_grid/index: pageSize
+    l2_dashboards/l2_data_connectors/reskin/parameterTypesTab/parameterTypesGrid/index.json
+        -> @l2_dashboards/overrides/l2_grid/index: pageSize
+    l2_dashboards/l2_data_connectors/reskin/securityTab/securityGrid/index.json
+        -> @l2_dashboards/overrides/l2_grid/index: pageSize
+    ... and 194 more (see unused-traitprps-report.json)
+
+  Report: D:\development\intenda\codex projects\legoz-workspace\tools\opus-ui-app-cleaner\output\unused-traitprps-report.json
+
+======== [pass 1] [merge] Inline single-use traits ========
+
+WARNING: ./deleted-files/ exists — single-use analysis reflects the reduced workspace.
+
+Pass 1: 1360 merged, 1717 skipped
+Pass 2: 261 merged, 1456 skipped
+Pass 3: 47 merged, 1408 skipped
+Pass 4: 4 merged, 1404 skipped
+Pass 5: 0 merged, 1404 skipped
+
+================ Merge summary (APPLIED) ================
+
+  Merged:  1672 traits inlined into their single use location
+  Skipped: 7389
+     5737  reference is not a traits-array entry
+      506  trait file was modified this pass
+      456  host is itself being merged away this pass
+      279  trait has morph:true acceptPrps
+      216  trait entry has a runtime condition
+      150  only reference is in JS/JSX code
+       15  not first in traits array: a preceding trait entry has a dynamic path
+       10  only reference is dynamic
+       10  theme/config file involved
+        5  trait has conditional nested traits
+        5  not first in traits array: preceding trait "./functional/closePanelOnEscKey" cannot be analyzed
+
+  Backups: D:\development\intenda\codex projects\legoz-workspace\tools\opus-ui-app-cleaner\output\merged-traits-backup
+    traits/     — the merged (now removed) trait files
+    originals/  — pre-merge versions of every modified host file (first version per run)
+
+  Report: D:\development\intenda\codex projects\legoz-workspace\tools\opus-ui-app-cleaner\output\merge-report.json
+
+======== [pass 1] [srcactions] Convert declarative scripts to srcActions ========
+Deposited network helper: l2_util/scriptHelpers/net.js
+
+================ Script conversion (APPLIED) ================
+
+  Scripts converted: 2210 (2210 JS files)
+  Actions: 7353 native, 0 delegated to runScript (100% native)
+  morph() fallback expressions: 0
+  Script lines: 68,512 declarative before, 37,830 generated JS after
+  Skipped scripts: 631
+  Generated-JS syntax errors: 0
+  Workspace size (ensemble .json+.js): 9,648,438 chars before, 9,690,433 after (grew 41,995 = -0.4%)
+    scps: 1135
+    fireScript: 991
+    dtaScps: 84
+
+  Report: D:\development\intenda\codex projects\legoz-workspace\tools\opus-ui-app-cleaner\output\convert-report.json
+
+======== [pass 1] [check] Verify no new reference issues ========
+check-refs: 22 issue(s) total, 52 baselined, 0 NEW
+2 pre-existing issue(s) moved to a new file (not failures):
+  [moved] @l2_ontology/reskin/ontologies/visual/propertiesPanel/terms/functional/saveTermOnBlur   now in l2_ontology/reskin/ontologies/index.json
+  [moved] @l2_ontology/reskin/ontologies/visual/propertiesPanel/terms/functional/saveTermOnBlur   now in l2_ontology/reskin/ontologies/index.json
+5 ref(s) point at intentionally deleted files (referrers are dead code — not failures):
+  [deleted-target] @l2_buttons/samples/basic   in l2_buttons/src/main.jsx
+  [deleted-target] @l2_grid/samples/staticData   in l2_grid/src/main.jsx
+  [deleted-target] @l2_inputs/samples/basic   in l2_inputs/src/main.jsx
+  [deleted-target] @l2_ontology/samples/startup   in l2_ontology/src/main.jsx
+  [deleted-target] @l2_ontology/studio/workspace/canvas/visual/lineageBox/index   in l2_ontology/studio/workspace/tabs/visual/lineage/functional/functions/generateLineageComponents.js
+37 baselined issue(s) no longer occur — consider --update-baseline
+OK
+
+======== [pass 1] [redundant] Report: prps equal to component defaults ========
+
+================ Redundant prps (REPORT ONLY) ================
+
+  Component types with literal defaults: 29 (34 props.js parsed, 15 skipped, 29 theme overrides)
+  Prps set to the type's existing default: 37 in 26 files
+
+    l2_dashboards/home/pieChart/index.json
+        pieChart.showTooltip = true (already the default)
+    l2_dashboards/home/pieChart/index.json
+        pieChart.cutout = 0 (already the default)
+    l2_dashboards/home/pieChart/index.json
+        pieChart.tooltipFontColor = "#222" (already the default)
+    l2_dashboards/home/publicationStatusGrid/firstCell.json
+        label.userSelect = "text" (already the default)
+    l2_dashboards/l2_canvas_shared/canvas/tabManager/tabContents/canvasPedigree/pedigreeToolbar/inputSearchPedigree/index.json
+        input.colorPlaceholder = "secondaryText" (already the default)
+    l2_dashboards/l2_data_sources/testResultPanel/container/resultDetailContainer.json
+        label.userSelect = "text" (already the default)
+    l2_dashboards/l2_entities/entitiesGrid/dataSourceHeaderCell/index.json
+        label.userSelect = "text" (already the default)
+    l2_dashboards/l2_object_builder/panels/moreInfoPanel/sharedGrids/dataSourceQuery/index.json
+        label.userSelect = "text" (already the default)
+    l2_dashboards/l2_object_builder/panels/moreInfoPanel/sharedGrids/dataSourceQuery/index.json
+        label.userSelect = "text" (already the default)
+    l2_dashboards/l2_object_builder/panels/shared/cacheStatusCell/index.json
+        label.userSelect = "text" (already the default)
+    l2_dashboards/l2_object_builder/panels/shared/cacheStatusCell/index.json
+        label.userSelect = "text" (already the default)
+    l2_dashboards/l2_object_builder/panels/shared/cacheStatusCell/index.json
+        label.userSelect = "text" (already the default)
+    l2_dashboards/reskin/pageCachedObjects/errorPanel/container.json
+        label.userSelect = "text" (already the default)
+    l2_dashboards/reskin/pageCompareDOs/sharedGrids/dataSourceQuery/index.json
+        label.userSelect = "text" (already the default)
+    l2_dashboards/reskin/pageCompareDOs/sharedGrids/dataSourceQuery/index.json
+        label.userSelect = "text" (already the default)
+    l2_dashboards/reskin/pageCompareDOs/sharedGrids/dataSourceQuery/index.json
+        label.userSelect = "text" (already the default)
+    l2_dashboards/reskin/pageDataObject/DOAnnotations/sourceGridHeaderCell.json
+        label.userSelect = "text" (already the default)
+    l2_dashboards/reskin/pageDataObject/DOConfig/index.json
+        upload.canSelectMultiple = false (already the default)
+    l2_dashboards/reskin/pageDataObject/DODistributionSchedule/panelError/container.json
+        label.userSelect = "text" (already the default)
+    l2_dashboards/reskin/pageDataObject/DOFields/sourceGrid/sourceGridHeaderCell.json
+        label.userSelect = "text" (already the default)
+    ... and 17 more (--print for all)
+
+  Report only — a prp equal to today's default still pins the value; review before removing.
+
+  Report: D:\development\intenda\codex projects\legoz-workspace\tools\opus-ui-app-cleaner\output\redundant-prps.json
+
+
+======== [pass 1] [themekeys] Report: theme keys nothing references ========
+
+================ Unused theme keys (REPORT ONLY) ================
+
+  theme.actions  (2 of 31 keys unused)
+      cdm   (legoz/app/theme/actions.json)
+      roleTypes   (legoz/app/theme/actions.json)
+
+  theme.colors  (14 of 43 keys unused)
+      darkModePrimary   (l2_grid/theme/colors.json)
+      iconSecondary   (l2_grid/theme/colors.json)
+      superLightGrey   (l2_grid/theme/colors.json)
+      babyBlue   (l2_grid/theme/colors.json)
+      khaki   (l2_grid/theme/colors.json)
+      paleMint   (l2_grid/theme/colors.json)
+      fluorescentBlue   (l2_grid/theme/colors.json)
+      scrollbarTrack   (l2_grid/theme/colors.json)
+      scrollbarThumb   (l2_grid/theme/colors.json)
+      darkModePrimaryLighter   (legoz/app/theme/colors.json)
+      darkModePrimaryDarker   (legoz/app/theme/colors.json)
+      lightSecondaryDarker   (legoz/app/theme/colors.json)
+      infoDarker   (legoz/app/theme/colors.json)
+      iceBlueLighter   (legoz/app/theme/colors.json)
+
+  theme.colorsDark  (5 of 5 keys unused)
+      loaderIcon   (legoz/app/theme/colorsDark.json)
+      loaderBackground   (legoz/app/theme/colorsDark.json)
+      loaderBackgroundOpacity   (legoz/app/theme/colorsDark.json)
+      scrollbarTrack   (legoz/app/theme/colorsDark.json)
+      scrollbarThumb   (legoz/app/theme/colorsDark.json)
+
+  theme.colorsLight  (3 of 3 keys unused)
+      loaderIcon   (legoz/app/theme/colorsLight.json)
+      loaderBackground   (legoz/app/theme/colorsLight.json)
+      loaderBackgroundOpacity   (legoz/app/theme/colorsLight.json)
+
+  theme.components  (73 of 73 keys unused)
+      audioPlayer   (l2_grid/theme/components.json)
+      audioRecorder   (l2_grid/theme/components.json)
+      badge   (l2_grid/theme/components.json)
+      bladeManager   (l2_grid/theme/components.json)
+      bpm   (l2_grid/theme/components.json)
+      button   (l2_grid/theme/components.json)
+      calculationBuilder   (l2_grid/theme/components.json)
+      calendar   (l2_grid/theme/components.json)
+      camera   (l2_grid/theme/components.json)
+      canvas   (l2_grid/theme/components.json)
+      checkbox   (l2_grid/theme/components.json)
+      codeEditor   (l2_grid/theme/components.json)
+      container   (l2_grid/theme/components.json)
+      containerDnd   (l2_grid/theme/components.json)
+      containerMovable   (l2_grid/theme/components.json)
+      ... and 58 more (--print for all)
+
+  theme.componentsLight  (2 of 2 keys unused)
+      scrollbarTrack   (legoz/app/theme/componentsLight.json)
+      scrollbarThumb   (legoz/app/theme/componentsLight.json)
+
+  theme.functions  (2 of 2 keys unused)
+      getMessage   (legoz/app/theme/functions.json)
+      getEventParametersWithDynamicKeys   (legoz/app/theme/functions.json)
+
+  theme.global  (24 of 32 keys unused)
+      noPadding   (l2_grid/theme/global.json)
+      tinySmallPadding   (l2_grid/theme/global.json)
+      smallMediumPadding   (l2_grid/theme/global.json)
+      giantPadding   (l2_grid/theme/global.json)
+      borderRadius   (l2_grid/theme/global.json)
+      borderRadiusBig   (l2_grid/theme/global.json)
+      borderRadiusGiant   (l2_grid/theme/global.json)
+      fontSizeSmallest   (l2_grid/theme/global.json)
+      fontSizeSmaller   (l2_grid/theme/global.json)
+      fontSizeSmall   (l2_grid/theme/global.json)
+      fontSizeBig   (l2_grid/theme/global.json)
+      fontSizeBigger   (l2_grid/theme/global.json)
+      fontSizeBiggest   (l2_grid/theme/global.json)
+      fontFamily   (l2_grid/theme/global.json)
+      fontWeight   (l2_grid/theme/global.json)
+      ... and 9 more (--print for all)
+
+  theme.l2_buttons_colors  (13 of 26 keys unused)
+      text/textHoverOn   (l2_buttons/theme/l2_buttons_colors.json)
+      warning/textHoverOn   (l2_buttons/theme/l2_buttons_colors.json)
+      warning/textHoverOff   (l2_buttons/theme/l2_buttons_colors.json)
+      warning/iconHoverOn   (l2_buttons/theme/l2_buttons_colors.json)
+      warning/iconHoverOff   (l2_buttons/theme/l2_buttons_colors.json)
+      dynamic/cptHoverOn   (l2_buttons/theme/l2_buttons_colors.json)
+      dynamic/cptHoverOff   (l2_buttons/theme/l2_buttons_colors.json)
+      dynamic/iconHoverOn   (l2_buttons/theme/l2_buttons_colors.json)
+      dynamic/iconHoverOff   (l2_buttons/theme/l2_buttons_colors.json)
+      dynamic/borderHoverOn   (l2_buttons/theme/l2_buttons_colors.json)
+      dynamic/borderHoverOff   (l2_buttons/theme/l2_buttons_colors.json)
+      dynamic/bgHoverOn   (l2_buttons/theme/l2_buttons_colors.json)
+      dynamic/bgHoverOff   (l2_buttons/theme/l2_buttons_colors.json)
+
+  theme.l2_canvas_shared_functions  (2 of 2 keys unused)
+      buildDataObjectWorkspaceHeaders   (l2_dashboards/theme/l2_canvas_shared_functions.json)
+      buildExpandedWorkspaceHeaders   (l2_dashboards/theme/l2_canvas_shared_functions.json)
+
+  theme.l2_data_connectors_components  (1 of 1 keys unused)
+      markdownLabel   (l2_dashboards/theme/l2_data_connectors_components.json)
+
+  theme.l2_data_connectors_free_text  (1 of 1 keys unused)
+      userGuide   (l2_dashboards/theme/l2_data_connectors_free_text.json)
+
+  theme.l2_grid_functions  (2 of 2 keys unused)
+      buildWhereClause   (l2_grid/theme/l2_grid_functions.json)
+      doRecordsDiffer   (l2_grid/theme/l2_grid_functions.json)
+
+  theme.l2_menu_tree_colors  (9 of 23 keys unused)
+      menuItemIconActive   (l2_menu_tree/theme/l2_menu_tree_colors.json)
+      menuItemLabelActive   (l2_menu_tree/theme/l2_menu_tree_colors.json)
+      menuItemActiveBackground   (l2_menu_tree/theme/l2_menu_tree_colors.json)
+      menuItemHoverBackground   (l2_menu_tree/theme/l2_menu_tree_colors.json)
+      menuSectionExpandedBackground   (l2_menu_tree/theme/l2_menu_tree_colors.json)
+      menuSectionExpandedBackgroundAlpha   (l2_menu_tree/theme/l2_menu_tree_colors.json)
+      menuSectionExpandedBackgroundLevel2   (l2_menu_tree/theme/l2_menu_tree_colors.json)
+      iconItem   (l2_menu_tree/theme/l2_menu_tree_colors.json)
+      menuSectionExpandedBackgroundAlphaLevel2   (legoz/app/theme/l2_menu_tree_colors.json)
+
+  theme.l2_menu_tree_sizing  (3 of 15 keys unused)
+      prpsLogoExpanded   (l2_menu_tree/theme/l2_menu_tree_sizing.json)
+      prpsLogoCollapsed   (l2_menu_tree/theme/l2_menu_tree_sizing.json)
+      menuCollapseWidthBasedOnMaxDepth   (l2_menu_tree/theme/l2_menu_tree_sizing.json)
+
+  theme.l2_object_builder_functions  (3 of 3 keys unused)
+      setNewDOStateFromDataObjectConfigPanel   (l2_dashboards/theme/l2_object_builder_functions.json)
+      buildCalculationWgtData   (l2_dashboards/theme/l2_object_builder_functions.json)
+      buildInitialWgtBackgroundColor   (l2_dashboards/theme/l2_object_builder_functions.json)
+
+  theme.l2_ontology_functions  (31 of 31 keys unused)
+      manageOntologyBuilderData   (l2_ontology/theme/l2_ontology_functions.json)
+      generateLineageComponents   (l2_ontology/theme/l2_ontology_functions.json)
+      generateLineageData   (l2_ontology/theme/l2_ontology_functions.json)
+      buildMaintainEntityAttributeRows   (l2_ontology/theme/l2_ontology_functions.json)
+      buildTermsFromOntologyData   (l2_ontology/theme/l2_ontology_functions.json)
+      buildSectionData   (l2_ontology/theme/l2_ontology_functions.json)
+      reformatTreeData   (l2_ontology/theme/l2_ontology_functions.json)
+      buildSectionDataLinkScreen   (l2_ontology/theme/l2_ontology_functions.json)
+      urlEncodeBody   (l2_ontology/theme/l2_ontology_functions.json)
+      renderSparkLine   (l2_ontology/theme/l2_ontology_functions.json)
+      amendLinkedObjects   (l2_ontology/theme/l2_ontology_functions.json)
+      buildLinkedObjects   (l2_ontology/theme/l2_ontology_functions.json)
+      formatRuleOutcomeData   (l2_ontology/theme/l2_ontology_functions.json)
+      setOutcomeData   (l2_ontology/theme/l2_ontology_functions.json)
+      filterTermsList   (l2_ontology/theme/l2_ontology_functions.json)
+      ... and 16 more (--print for all)
+
+  theme.l2_ontology_system  (2 of 4 keys unused)
+      apiLocationX   (l2_ontology/theme/l2_ontology_system.json)
+      exceptionTrackerLocationX   (l2_ontology/theme/l2_ontology_system.json)
+
+  theme.l2_shell_functions  (1 of 1 keys unused)
+      getDate   (l2_shell/theme/l2_shell_functions.json)
+
+  theme.l2_shell_global  (1 of 1 keys unused)
+      prpsBackgroundContainer   (l2_shell/theme/l2_shell_global.json)
+
+  theme.l2_shell_images  (1 of 3 keys unused)
+      homeBackground   (l2_shell/theme/l2_shell_images.json)
+
+  theme.l2_shell_system  (1 of 3 keys unused)
+      sidebarDataTrait   (l2_shell/theme/l2_shell_system.json)
+
+  theme.l2_sidebar_colors  (9 of 9 keys unused)
+      background   (legoz/app/theme/l2_sidebar_colors.json)
+      borderRight   (legoz/app/theme/l2_sidebar_colors.json)
+      menuItemIconHoverOff   (legoz/app/theme/l2_sidebar_colors.json)
+      menuItemIconHoverOn   (legoz/app/theme/l2_sidebar_colors.json)
+      menuItemLabelHoverOff   (legoz/app/theme/l2_sidebar_colors.json)
+      menuItemLabelHoverOn   (legoz/app/theme/l2_sidebar_colors.json)
+      menuItemIconActive   (legoz/app/theme/l2_sidebar_colors.json)
+      menuItemLabelActive   (legoz/app/theme/l2_sidebar_colors.json)
+      parentItemBackgroundExpanded   (legoz/app/theme/l2_sidebar_colors.json)
+
+  theme.l2_topbar_colors  (3 of 3 keys unused)
+      pageIcon   (l2_topbar/theme/l2_topbar_colors.json)
+      pageTitle   (l2_topbar/theme/l2_topbar_colors.json)
+      lineUnderTitle   (l2_topbar/theme/l2_topbar_colors.json)
+
+  theme.messages  (5 of 27 keys unused)
+      organisationRoles   (legoz/app/theme/messages.json)
+      roleTypes   (legoz/app/theme/messages.json)
+      cdm   (legoz/app/theme/messages.json)
+      calculationBuilder   (legoz/app/theme/messages.json)
+      filterBuilder   (legoz/app/theme/messages.json)
+
+  theme.system  (2 of 11 keys unused)
+      urlEntry   (legoz/app/theme/system.json)
+      canvasLegendImage   (legoz/app/theme/system.json)
+
+  TOTAL: 215 of 364 theme keys have no visible accessor usage
+  Report only — theme accessors can be built dynamically; review before deleting.
+
+  Report: D:\development\intenda\codex projects\legoz-workspace\tools\opus-ui-app-cleaner\output\unused-theme-keys.json
+
+
+######## Pass 2 ########
+
+======== [pass 2] [baseline] Record pre-existing reference issues ========
+Baseline updated: 22 known issue(s) recorded in D:\development\intenda\codex projects\legoz-workspace\tools\opus-ui-app-cleaner\output\check-refs-baseline.json
+
+======== [pass 2] [unused] Unused-file analysis ========
+Entrypoints: D:\development\intenda\codex projects\legoz-workspace\tools\opus-ui-app-cleaner\entrypoints.sample.txt
+
+================ Unused JSON summary ================
+
+  l2_dashboards                 1141 json     17 unused     17 dead-end roots
+  l2_buttons                      10 json      0 unused      0 dead-end roots
+  l2_confirmation_panel            1 json      0 unused      0 dead-end roots
+  l2_context_menu                  2 json      0 unused      0 dead-end roots
+  l2_date_picker                   8 json      6 unused      6 dead-end roots
+  l2_grid                         69 json      0 unused      0 dead-end roots
+  l2_inputs                       31 json      0 unused      0 dead-end roots
+  l2_menu_tree                    21 json      1 unused      1 dead-end roots
+  l2_modal_panel                   4 json      0 unused      0 dead-end roots
+  l2_page_action_bar               1 json      0 unused      0 dead-end roots
+  l2_shell                        34 json      1 unused      1 dead-end roots
+  l2_tab_manager                   6 json      0 unused      0 dead-end roots
+  l2_topbar                       13 json      0 unused      0 dead-end roots
+  l2_util                          4 json      0 unused      0 dead-end roots
+  l2_session_expiry_checker        2 json      0 unused      0 dead-end roots
+  l2_ontology                    850 json     35 unused     35 dead-end roots
+  (app)                           20 json      0 unused      0 dead-end roots
+
+  TOTAL: 2217 JSON files, 2157 used, 60 unused (60 dead-end roots)
+  A "dead-end root" is an unused file no other unused file references — review these;
+  the rest of the unused files hang off them as descendants.
+  Unresolved references: 7 (likely typos or deleted files)
+  Dynamic references:    2 (contain %prp%/{state} — not statically resolvable)
+
+  Report:     D:\development\intenda\codex projects\legoz-workspace\tools\opus-ui-app-cleaner\output\unused-report.json
+  Flat list:  D:\development\intenda\codex projects\legoz-workspace\tools\opus-ui-app-cleaner\output\unused-files.txt
+  Roots only: D:\development\intenda\codex projects\legoz-workspace\tools\opus-ui-app-cleaner\output\unused-roots.txt
+
+  Tip: node index.js --explain=<workspace-relative-path> shows why a file is considered used.
+
+
+======== [pass 2] [delete] Move unused JSON out of the workspace ========
+
+60 file(s) moved to D:\development\intenda\codex projects\legoz-workspace\tools\opus-ui-app-cleaner\output\deleted-files
+
+Restore everything with: node undelete-files.js
+
+======== [pass 2] [acceptprps] Strip unused acceptPrps ========
+
+Removing unused acceptPrps from 7 files:
+
+  l2_dashboards/l2_canvas_shared/canvas/tabManager/tabContents/canvasPedigree/pedigreeToolbar/historyFieldsSwitch/index.json
+      removed: scope
+  l2_dashboards/l2_event_builder/panels/createEditEventPanel/container/sectionDependencies/dependencyRow/index.json
+      removed: index
+  l2_dashboards/l2_organisation_management/reskin/DOConfig/dataManager/onMountFetchData.json
+      removed: dataObject
+  l2_dashboards/reskin/sectionBottomPanel/index.json
+      removed: parentId
+  l2_ontology/explorer/changelog/configurationPanel/form/visual/changeLogApproveButton.json
+      removed: rejectScope
+  l2_ontology/explorer/changelog/configurationPanel/form/visual/changeLogRejectButton.json
+      removed: approveScope
+  l2_ontology/explorer/dataModels/connectAllEntitiesPanel/form/visual/entityDropdown/visual/input/index.json
+      removed: label
+
+Removed 7 props from 7 files.
+Manifest: D:\development\intenda\codex projects\legoz-workspace\tools\opus-ui-app-cleaner\output\deleted-accept-prps-manifest.json
+Revert with: node delete-accept-prps.js --undo
+
+
+======== [pass 2] [collapse] Collapse passthrough wrapper traits ========
+Round 1: 0 wrapper(s) collapsible
+
+================ Wrapper traits (APPLIED) ================
+
+  Collapsed: 0 wrapper(s) over 1 round(s)
+  Kept:      0 (menu/JS/dynamic/non-traits refs)
+
+  Report: D:\development\intenda\codex projects\legoz-workspace\tools\opus-ui-app-cleaner\output\collapse-report.json
+
+======== [pass 2] [dedupe] Deduplicate identical traits ========
+
+================ Duplicate traits (APPLIED) ================
+
+  Duplicate groups:      16
+  Files removed:         19 (references repointed: 19)
+  Duplicates kept:       2 (menu/JS/dynamic references)
+
+  keep    l2_dashboards/l2_background_jobs/errorInfoPanel/toolbar/index.json
+  remove  l2_dashboards/l2_caching_schedules/errorInfoPanel/toolbar/index.json
+  remove  l2_dashboards/l2_background_jobs/publicationReportModal/errorInfoPanel/toolbar/index.json
+
+  keep    l2_dashboards/reskin/panels/AdvancedSearchPanel/gridContainer/grid/functional/dataManager/index.json
+  remove  l2_dashboards/l2_data_objects/advancedSearchPanel/gridContainer/grid/functional/dataManager/index.json
+
+  keep    l2_dashboards/l2_entities/advancedSearchPanel/toolbar/index.json
+  remove  l2_dashboards/l2_data_objects/advancedSearchPanel/toolbar/index.json
+
+  keep    l2_dashboards/reskin/pageDataObject/DOAttributeAccess/functional/gridModifiedRecordsManager/index.json
+  remove  l2_dashboards/l2_data_objects/panels/dataObjectConfigurationPanel/container/tabContainer/attributeAccessTab/grid/grid/functional/modifiedRecordsManager/index.json
+
+  keep    l2_dashboards/l2_data_objects/panels/dataObjectConfigurationPanel/container/tabContainer/detailsTab/toolbar/index.json
+  remove  l2_dashboards/l2_data_objects/panels/dataObjectConfigurationPanel/container/tabContainer/rowFilterTab/toolbar/index.json
+  remove  l2_dashboards/l2_data_objects/panels/dataObjectConfigurationPanel/container/tabContainer/permissionsTab/toolbar/index.json
+  remove  l2_dashboards/l2_data_objects/panels/dataObjectConfigurationPanel/container/tabContainer/attributeAccessTab/toolbar/index.json
+  remove  l2_dashboards/l2_data_objects/panels/dataObjectConfigurationPanel/container/tabContainer/propertiesTab/toolbar/viewToolbar.json
+  remove  l2_dashboards/l2_data_objects/panels/dataObjectConfigurationPanel/container/tabContainer/cachingScheduleTab/toolbar/viewToolbar.json
+
+  keep    l2_dashboards/l2_data_objects/panels/folderSecurityPanel/toolbar/index.json
+  remove  l2_dashboards/reskin/explorers/objectLibrary/panels/folderSecurityPanel/toolbar/index.json
+
+  keep    l2_dashboards/l2_event_builder/panels/createEditEventPanel/container/sectionDependencies/addDependencyButton/index.json
+  remove  l2_dashboards/reskin/explorers/systemAdministration/createEditEventPanel/container/sectionDependencies/addDependencyButton/index.json
+
+  keep    l2_dashboards/l2_event_builder/panels/createEditEventPanel/container/sectionDynamicParameters/addParameterButton/index.json
+  remove  l2_dashboards/reskin/explorers/systemAdministration/createEditEventPanel/container/sectionDynamicParameters/addParameterButton/index.json
+
+  keep    l2_dashboards/l2_organisation_management/reskin/rolesGrid/roleGrid/functional/modifiedRecordsManager/index.json
+  remove  l2_dashboards/l2_role_management/reskin/organisationsGrid/roleGrid/functional/modifiedRecordsManager/index.json
+
+  keep    l2_dashboards/l2_role_management/menuAccessPanel/container/menuStructure/treeView/functionItem/index.json
+  remove  l2_dashboards/l2_role_management/reskin/organisationsGrid/menuAccessPanel/container/menuStructure/treeView/functionItem/index.json
+
+  ... and 4 more groups (see dedupe-report.json)
+
+  Report: D:\development\intenda\codex projects\legoz-workspace\tools\opus-ui-app-cleaner\output\dedupe-report.json
+  Backup: D:\development\intenda\codex projects\legoz-workspace\tools\opus-ui-app-cleaner\output\dedupe-backup
+
+======== [pass 2] [traitprps] Strip dead call-site traitPrps ========
+
+================ Dead traitPrps at call sites (APPLIED) ================
+
+  Call sites with dead traitPrps: 7 (7 keys) in 4 files
+    l2_dashboards/l2_canvas_shared/canvas/tabManager/tabContents/canvasPedigree/pedigreeToolbar/index.json
+        -> ./historyFieldsSwitch/index: scope
+    l2_ontology/explorer/changelog/configurationPanel/form/sections/additions/index.json
+        -> @l2_ontology/explorer/changelog/configurationPanel/form/visual/changeLogApproveButton: rejectScope
+    l2_ontology/explorer/changelog/configurationPanel/form/sections/additions/index.json
+        -> @l2_ontology/explorer/changelog/configurationPanel/form/visual/changeLogRejectButton: approveScope
+    l2_ontology/explorer/changelog/configurationPanel/form/sections/changes/index.json
+        -> @l2_ontology/explorer/changelog/configurationPanel/form/visual/changeLogApproveButton: rejectScope
+    l2_ontology/explorer/changelog/configurationPanel/form/sections/changes/index.json
+        -> @l2_ontology/explorer/changelog/configurationPanel/form/visual/changeLogRejectButton: approveScope
+    l2_ontology/explorer/changelog/configurationPanel/form/sections/removals/index.json
+        -> @l2_ontology/explorer/changelog/configurationPanel/form/visual/changeLogApproveButton: rejectScope
+    l2_ontology/explorer/changelog/configurationPanel/form/sections/removals/index.json
+        -> @l2_ontology/explorer/changelog/configurationPanel/form/visual/changeLogRejectButton: approveScope
+
+  Report: D:\development\intenda\codex projects\legoz-workspace\tools\opus-ui-app-cleaner\output\unused-traitprps-report.json
+
+======== [pass 2] [merge] Inline single-use traits ========
+
+WARNING: ./deleted-files/ exists — single-use analysis reflects the reduced workspace.
+
+Pass 1: 12 merged, 1332 skipped
+Pass 2: 0 merged, 1332 skipped
+
+================ Merge summary (APPLIED) ================
+
+  Merged:  12 traits inlined into their single use location
+  Skipped: 2664
+     2192  reference is not a traits-array entry
+      258  only reference is in JS/JSX code
+      108  trait has morph:true acceptPrps
+       88  trait entry has a runtime condition
+        6  not first in traits array: a preceding trait entry has a dynamic path
+        4  only reference is dynamic
+        4  theme/config file involved
+        2  trait has conditional nested traits
+        2  not first in traits array: preceding trait "./functional/closePanelOnEscKey" cannot be analyzed
+
+  Backups: D:\development\intenda\codex projects\legoz-workspace\tools\opus-ui-app-cleaner\output\merged-traits-backup
+    traits/     — the merged (now removed) trait files
+    originals/  — pre-merge versions of every modified host file (first version per run)
+
+  Report: D:\development\intenda\codex projects\legoz-workspace\tools\opus-ui-app-cleaner\output\merge-report.json
+
+======== [pass 2] [srcactions] Convert declarative scripts to srcActions ========
+
+================ Script conversion (APPLIED) ================
+
+  Scripts converted: 0 (0 JS files)
+  Actions: 0 native, 0 delegated to runScript (0% native)
+  morph() fallback expressions: 0
+  Script lines: 0 declarative before, 0 generated JS after
+  Skipped scripts: 928
+  Generated-JS syntax errors: 0
+  Workspace size (ensemble .json+.js): 9,568,281 chars before, 9,568,281 after (saved 0 = 0.0%)
+
+  Report: D:\development\intenda\codex projects\legoz-workspace\tools\opus-ui-app-cleaner\output\convert-report.json
+
+======== [pass 2] [check] Verify no new reference issues ========
+check-refs: 22 issue(s) total, 21 baselined, 0 NEW
+OK
+
+======== [pass 2] [redundant] Report: prps equal to component defaults ========
+
+================ Redundant prps (REPORT ONLY) ================
+
+  Component types with literal defaults: 29 (34 props.js parsed, 15 skipped, 29 theme overrides)
+  Prps set to the type's existing default: 37 in 26 files
+
+    l2_dashboards/home/pieChart/index.json
+        pieChart.showTooltip = true (already the default)
+    l2_dashboards/home/pieChart/index.json
+        pieChart.cutout = 0 (already the default)
+    l2_dashboards/home/pieChart/index.json
+        pieChart.tooltipFontColor = "#222" (already the default)
+    l2_dashboards/home/publicationStatusGrid/firstCell.json
+        label.userSelect = "text" (already the default)
+    l2_dashboards/l2_canvas_shared/canvas/tabManager/tabContents/canvasPedigree/pedigreeToolbar/inputSearchPedigree/index.json
+        input.colorPlaceholder = "secondaryText" (already the default)
+    l2_dashboards/l2_data_sources/testResultPanel/container/resultDetailContainer.json
+        label.userSelect = "text" (already the default)
+    l2_dashboards/l2_entities/entitiesGrid/dataSourceHeaderCell/index.json
+        label.userSelect = "text" (already the default)
+    l2_dashboards/l2_object_builder/panels/moreInfoPanel/sharedGrids/dataSourceQuery/index.json
+        label.userSelect = "text" (already the default)
+    l2_dashboards/l2_object_builder/panels/moreInfoPanel/sharedGrids/dataSourceQuery/index.json
+        label.userSelect = "text" (already the default)
+    l2_dashboards/l2_object_builder/panels/shared/cacheStatusCell/index.json
+        label.userSelect = "text" (already the default)
+    l2_dashboards/l2_object_builder/panels/shared/cacheStatusCell/index.json
+        label.userSelect = "text" (already the default)
+    l2_dashboards/l2_object_builder/panels/shared/cacheStatusCell/index.json
+        label.userSelect = "text" (already the default)
+    l2_dashboards/reskin/pageCachedObjects/errorPanel/container.json
+        label.userSelect = "text" (already the default)
+    l2_dashboards/reskin/pageCompareDOs/sharedGrids/dataSourceQuery/index.json
+        label.userSelect = "text" (already the default)
+    l2_dashboards/reskin/pageCompareDOs/sharedGrids/dataSourceQuery/index.json
+        label.userSelect = "text" (already the default)
+    l2_dashboards/reskin/pageCompareDOs/sharedGrids/dataSourceQuery/index.json
+        label.userSelect = "text" (already the default)
+    l2_dashboards/reskin/pageDataObject/DOAnnotations/sourceGridHeaderCell.json
+        label.userSelect = "text" (already the default)
+    l2_dashboards/reskin/pageDataObject/DOConfig/index.json
+        upload.canSelectMultiple = false (already the default)
+    l2_dashboards/reskin/pageDataObject/DODistributionSchedule/panelError/container.json
+        label.userSelect = "text" (already the default)
+    l2_dashboards/reskin/pageDataObject/DOFields/sourceGrid/sourceGridHeaderCell.json
+        label.userSelect = "text" (already the default)
+    ... and 17 more (--print for all)
+
+  Report only — a prp equal to today's default still pins the value; review before removing.
+
+  Report: D:\development\intenda\codex projects\legoz-workspace\tools\opus-ui-app-cleaner\output\redundant-prps.json
+
+
+======== [pass 2] [themekeys] Report: theme keys nothing references ========
+
+================ Unused theme keys (REPORT ONLY) ================
+
+  theme.actions  (2 of 31 keys unused)
+      cdm   (legoz/app/theme/actions.json)
+      roleTypes   (legoz/app/theme/actions.json)
+
+  theme.colors  (14 of 43 keys unused)
+      darkModePrimary   (l2_grid/theme/colors.json)
+      iconSecondary   (l2_grid/theme/colors.json)
+      superLightGrey   (l2_grid/theme/colors.json)
+      babyBlue   (l2_grid/theme/colors.json)
+      khaki   (l2_grid/theme/colors.json)
+      paleMint   (l2_grid/theme/colors.json)
+      fluorescentBlue   (l2_grid/theme/colors.json)
+      scrollbarTrack   (l2_grid/theme/colors.json)
+      scrollbarThumb   (l2_grid/theme/colors.json)
+      darkModePrimaryLighter   (legoz/app/theme/colors.json)
+      darkModePrimaryDarker   (legoz/app/theme/colors.json)
+      lightSecondaryDarker   (legoz/app/theme/colors.json)
+      infoDarker   (legoz/app/theme/colors.json)
+      iceBlueLighter   (legoz/app/theme/colors.json)
+
+  theme.colorsDark  (5 of 5 keys unused)
+      loaderIcon   (legoz/app/theme/colorsDark.json)
+      loaderBackground   (legoz/app/theme/colorsDark.json)
+      loaderBackgroundOpacity   (legoz/app/theme/colorsDark.json)
+      scrollbarTrack   (legoz/app/theme/colorsDark.json)
+      scrollbarThumb   (legoz/app/theme/colorsDark.json)
+
+  theme.colorsLight  (3 of 3 keys unused)
+      loaderIcon   (legoz/app/theme/colorsLight.json)
+      loaderBackground   (legoz/app/theme/colorsLight.json)
+      loaderBackgroundOpacity   (legoz/app/theme/colorsLight.json)
+
+  theme.components  (73 of 73 keys unused)
+      audioPlayer   (l2_grid/theme/components.json)
+      audioRecorder   (l2_grid/theme/components.json)
+      badge   (l2_grid/theme/components.json)
+      bladeManager   (l2_grid/theme/components.json)
+      bpm   (l2_grid/theme/components.json)
+      button   (l2_grid/theme/components.json)
+      calculationBuilder   (l2_grid/theme/components.json)
+      calendar   (l2_grid/theme/components.json)
+      camera   (l2_grid/theme/components.json)
+      canvas   (l2_grid/theme/components.json)
+      checkbox   (l2_grid/theme/components.json)
+      codeEditor   (l2_grid/theme/components.json)
+      container   (l2_grid/theme/components.json)
+      containerDnd   (l2_grid/theme/components.json)
+      containerMovable   (l2_grid/theme/components.json)
+      ... and 58 more (--print for all)
+
+  theme.componentsLight  (2 of 2 keys unused)
+      scrollbarTrack   (legoz/app/theme/componentsLight.json)
+      scrollbarThumb   (legoz/app/theme/componentsLight.json)
+
+  theme.functions  (2 of 2 keys unused)
+      getMessage   (legoz/app/theme/functions.json)
+      getEventParametersWithDynamicKeys   (legoz/app/theme/functions.json)
+
+  theme.global  (24 of 32 keys unused)
+      noPadding   (l2_grid/theme/global.json)
+      tinySmallPadding   (l2_grid/theme/global.json)
+      smallMediumPadding   (l2_grid/theme/global.json)
+      giantPadding   (l2_grid/theme/global.json)
+      borderRadius   (l2_grid/theme/global.json)
+      borderRadiusBig   (l2_grid/theme/global.json)
+      borderRadiusGiant   (l2_grid/theme/global.json)
+      fontSizeSmallest   (l2_grid/theme/global.json)
+      fontSizeSmaller   (l2_grid/theme/global.json)
+      fontSizeSmall   (l2_grid/theme/global.json)
+      fontSizeBig   (l2_grid/theme/global.json)
+      fontSizeBigger   (l2_grid/theme/global.json)
+      fontSizeBiggest   (l2_grid/theme/global.json)
+      fontFamily   (l2_grid/theme/global.json)
+      fontWeight   (l2_grid/theme/global.json)
+      ... and 9 more (--print for all)
+
+  theme.l2_buttons_colors  (13 of 26 keys unused)
+      text/textHoverOn   (l2_buttons/theme/l2_buttons_colors.json)
+      warning/textHoverOn   (l2_buttons/theme/l2_buttons_colors.json)
+      warning/textHoverOff   (l2_buttons/theme/l2_buttons_colors.json)
+      warning/iconHoverOn   (l2_buttons/theme/l2_buttons_colors.json)
+      warning/iconHoverOff   (l2_buttons/theme/l2_buttons_colors.json)
+      dynamic/cptHoverOn   (l2_buttons/theme/l2_buttons_colors.json)
+      dynamic/cptHoverOff   (l2_buttons/theme/l2_buttons_colors.json)
+      dynamic/iconHoverOn   (l2_buttons/theme/l2_buttons_colors.json)
+      dynamic/iconHoverOff   (l2_buttons/theme/l2_buttons_colors.json)
+      dynamic/borderHoverOn   (l2_buttons/theme/l2_buttons_colors.json)
+      dynamic/borderHoverOff   (l2_buttons/theme/l2_buttons_colors.json)
+      dynamic/bgHoverOn   (l2_buttons/theme/l2_buttons_colors.json)
+      dynamic/bgHoverOff   (l2_buttons/theme/l2_buttons_colors.json)
+
+  theme.l2_canvas_shared_functions  (2 of 2 keys unused)
+      buildDataObjectWorkspaceHeaders   (l2_dashboards/theme/l2_canvas_shared_functions.json)
+      buildExpandedWorkspaceHeaders   (l2_dashboards/theme/l2_canvas_shared_functions.json)
+
+  theme.l2_data_connectors_components  (1 of 1 keys unused)
+      markdownLabel   (l2_dashboards/theme/l2_data_connectors_components.json)
+
+  theme.l2_data_connectors_free_text  (1 of 1 keys unused)
+      userGuide   (l2_dashboards/theme/l2_data_connectors_free_text.json)
+
+  theme.l2_grid_functions  (2 of 2 keys unused)
+      buildWhereClause   (l2_grid/theme/l2_grid_functions.json)
+      doRecordsDiffer   (l2_grid/theme/l2_grid_functions.json)
+
+  theme.l2_menu_tree_colors  (9 of 23 keys unused)
+      menuItemIconActive   (l2_menu_tree/theme/l2_menu_tree_colors.json)
+      menuItemLabelActive   (l2_menu_tree/theme/l2_menu_tree_colors.json)
+      menuItemActiveBackground   (l2_menu_tree/theme/l2_menu_tree_colors.json)
+      menuItemHoverBackground   (l2_menu_tree/theme/l2_menu_tree_colors.json)
+      menuSectionExpandedBackground   (l2_menu_tree/theme/l2_menu_tree_colors.json)
+      menuSectionExpandedBackgroundAlpha   (l2_menu_tree/theme/l2_menu_tree_colors.json)
+      menuSectionExpandedBackgroundLevel2   (l2_menu_tree/theme/l2_menu_tree_colors.json)
+      iconItem   (l2_menu_tree/theme/l2_menu_tree_colors.json)
+      menuSectionExpandedBackgroundAlphaLevel2   (legoz/app/theme/l2_menu_tree_colors.json)
+
+  theme.l2_menu_tree_sizing  (3 of 15 keys unused)
+      prpsLogoExpanded   (l2_menu_tree/theme/l2_menu_tree_sizing.json)
+      prpsLogoCollapsed   (l2_menu_tree/theme/l2_menu_tree_sizing.json)
+      menuCollapseWidthBasedOnMaxDepth   (l2_menu_tree/theme/l2_menu_tree_sizing.json)
+
+  theme.l2_object_builder_functions  (3 of 3 keys unused)
+      setNewDOStateFromDataObjectConfigPanel   (l2_dashboards/theme/l2_object_builder_functions.json)
+      buildCalculationWgtData   (l2_dashboards/theme/l2_object_builder_functions.json)
+      buildInitialWgtBackgroundColor   (l2_dashboards/theme/l2_object_builder_functions.json)
+
+  theme.l2_ontology_functions  (31 of 31 keys unused)
+      manageOntologyBuilderData   (l2_ontology/theme/l2_ontology_functions.json)
+      generateLineageComponents   (l2_ontology/theme/l2_ontology_functions.json)
+      generateLineageData   (l2_ontology/theme/l2_ontology_functions.json)
+      buildMaintainEntityAttributeRows   (l2_ontology/theme/l2_ontology_functions.json)
+      buildTermsFromOntologyData   (l2_ontology/theme/l2_ontology_functions.json)
+      buildSectionData   (l2_ontology/theme/l2_ontology_functions.json)
+      reformatTreeData   (l2_ontology/theme/l2_ontology_functions.json)
+      buildSectionDataLinkScreen   (l2_ontology/theme/l2_ontology_functions.json)
+      urlEncodeBody   (l2_ontology/theme/l2_ontology_functions.json)
+      renderSparkLine   (l2_ontology/theme/l2_ontology_functions.json)
+      amendLinkedObjects   (l2_ontology/theme/l2_ontology_functions.json)
+      buildLinkedObjects   (l2_ontology/theme/l2_ontology_functions.json)
+      formatRuleOutcomeData   (l2_ontology/theme/l2_ontology_functions.json)
+      setOutcomeData   (l2_ontology/theme/l2_ontology_functions.json)
+      filterTermsList   (l2_ontology/theme/l2_ontology_functions.json)
+      ... and 16 more (--print for all)
+
+  theme.l2_ontology_system  (2 of 4 keys unused)
+      apiLocationX   (l2_ontology/theme/l2_ontology_system.json)
+      exceptionTrackerLocationX   (l2_ontology/theme/l2_ontology_system.json)
+
+  theme.l2_shell_functions  (1 of 1 keys unused)
+      getDate   (l2_shell/theme/l2_shell_functions.json)
+
+  theme.l2_shell_global  (1 of 1 keys unused)
+      prpsBackgroundContainer   (l2_shell/theme/l2_shell_global.json)
+
+  theme.l2_shell_images  (1 of 3 keys unused)
+      homeBackground   (l2_shell/theme/l2_shell_images.json)
+
+  theme.l2_shell_system  (1 of 3 keys unused)
+      sidebarDataTrait   (l2_shell/theme/l2_shell_system.json)
+
+  theme.l2_sidebar_colors  (9 of 9 keys unused)
+      background   (legoz/app/theme/l2_sidebar_colors.json)
+      borderRight   (legoz/app/theme/l2_sidebar_colors.json)
+      menuItemIconHoverOff   (legoz/app/theme/l2_sidebar_colors.json)
+      menuItemIconHoverOn   (legoz/app/theme/l2_sidebar_colors.json)
+      menuItemLabelHoverOff   (legoz/app/theme/l2_sidebar_colors.json)
+      menuItemLabelHoverOn   (legoz/app/theme/l2_sidebar_colors.json)
+      menuItemIconActive   (legoz/app/theme/l2_sidebar_colors.json)
+      menuItemLabelActive   (legoz/app/theme/l2_sidebar_colors.json)
+      parentItemBackgroundExpanded   (legoz/app/theme/l2_sidebar_colors.json)
+
+  theme.l2_topbar_colors  (3 of 3 keys unused)
+      pageIcon   (l2_topbar/theme/l2_topbar_colors.json)
+      pageTitle   (l2_topbar/theme/l2_topbar_colors.json)
+      lineUnderTitle   (l2_topbar/theme/l2_topbar_colors.json)
+
+  theme.messages  (6 of 27 keys unused)
+      organisationRoles   (legoz/app/theme/messages.json)
+      roleTypes   (legoz/app/theme/messages.json)
+      cdm   (legoz/app/theme/messages.json)
+      calculationBuilder   (legoz/app/theme/messages.json)
+      filterBuilder   (legoz/app/theme/messages.json)
+      menuTree   (legoz/app/theme/messages.json)
+
+  theme.system  (2 of 11 keys unused)
+      urlEntry   (legoz/app/theme/system.json)
+      canvasLegendImage   (legoz/app/theme/system.json)
+
+  TOTAL: 216 of 364 theme keys have no visible accessor usage
+  Report only — theme accessors can be built dynamically; review before deleting.
+
+  Report: D:\development\intenda\codex projects\legoz-workspace\tools\opus-ui-app-cleaner\output\unused-theme-keys.json
+
+
+######## Pass 3 ########
+
+======== [pass 3] [baseline] Record pre-existing reference issues ========
+Baseline updated: 22 known issue(s) recorded in D:\development\intenda\codex projects\legoz-workspace\tools\opus-ui-app-cleaner\output\check-refs-baseline.json
+
+======== [pass 3] [unused] Unused-file analysis ========
+Entrypoints: D:\development\intenda\codex projects\legoz-workspace\tools\opus-ui-app-cleaner\entrypoints.sample.txt
+
+================ Unused JSON summary ================
+
+  l2_dashboards                 1095 json      0 unused      0 dead-end roots
+  l2_buttons                      10 json      0 unused      0 dead-end roots
+  l2_confirmation_panel            1 json      0 unused      0 dead-end roots
+  l2_context_menu                  2 json      0 unused      0 dead-end roots
+  l2_date_picker                   2 json      0 unused      0 dead-end roots
+  l2_grid                         69 json      0 unused      0 dead-end roots
+  l2_inputs                       29 json      0 unused      0 dead-end roots
+  l2_menu_tree                    20 json      0 unused      0 dead-end roots
+  l2_modal_panel                   4 json      0 unused      0 dead-end roots
+  l2_page_action_bar               1 json      0 unused      0 dead-end roots
+  l2_shell                        33 json      0 unused      0 dead-end roots
+  l2_tab_manager                   6 json      0 unused      0 dead-end roots
+  l2_topbar                       13 json      0 unused      0 dead-end roots
+  l2_util                          4 json      0 unused      0 dead-end roots
+  l2_session_expiry_checker        2 json      0 unused      0 dead-end roots
+  l2_ontology                    815 json      0 unused      0 dead-end roots
+  (app)                           20 json      0 unused      0 dead-end roots
+
+  TOTAL: 2126 JSON files, 2126 used, 0 unused (0 dead-end roots)
+  A "dead-end root" is an unused file no other unused file references — review these;
+  the rest of the unused files hang off them as descendants.
+  Unresolved references: 7 (likely typos or deleted files)
+  Dynamic references:    2 (contain %prp%/{state} — not statically resolvable)
+
+  Report:     D:\development\intenda\codex projects\legoz-workspace\tools\opus-ui-app-cleaner\output\unused-report.json
+  Flat list:  D:\development\intenda\codex projects\legoz-workspace\tools\opus-ui-app-cleaner\output\unused-files.txt
+  Roots only: D:\development\intenda\codex projects\legoz-workspace\tools\opus-ui-app-cleaner\output\unused-roots.txt
+
+  Tip: node index.js --explain=<workspace-relative-path> shows why a file is considered used.
+
+
+======== [pass 3] [delete] Move unused JSON out of the workspace ========
+
+0 file(s) moved to D:\development\intenda\codex projects\legoz-workspace\tools\opus-ui-app-cleaner\output\deleted-files
+
+======== [pass 3] [acceptprps] Strip unused acceptPrps ========
+No unused acceptPrps found. Nothing to do.
+
+======== [pass 3] [collapse] Collapse passthrough wrapper traits ========
+Round 1: 0 wrapper(s) collapsible
+
+================ Wrapper traits (APPLIED) ================
+
+  Collapsed: 0 wrapper(s) over 1 round(s)
+  Kept:      0 (menu/JS/dynamic/non-traits refs)
+
+  Report: D:\development\intenda\codex projects\legoz-workspace\tools\opus-ui-app-cleaner\output\collapse-report.json
+
+======== [pass 3] [dedupe] Deduplicate identical traits ========
+
+================ Duplicate traits (APPLIED) ================
+
+  Duplicate groups:      2
+  Files removed:         0 (references repointed: 0)
+  Duplicates kept:       2 (menu/JS/dynamic references)
+
+  Report: D:\development\intenda\codex projects\legoz-workspace\tools\opus-ui-app-cleaner\output\dedupe-report.json
+
+======== [pass 3] [traitprps] Strip dead call-site traitPrps ========
+
+================ Dead traitPrps at call sites (APPLIED) ================
+
+  Call sites with dead traitPrps: 0 (0 keys) in 0 files
+
+  Report: D:\development\intenda\codex projects\legoz-workspace\tools\opus-ui-app-cleaner\output\unused-traitprps-report.json
+
+======== [pass 3] [merge] Inline single-use traits ========
+
+WARNING: ./deleted-files/ exists — single-use analysis reflects the reduced workspace.
+
+Pass 1: 0 merged, 1332 skipped
+
+================ Merge summary (APPLIED) ================
+
+  Merged:  0 traits inlined into their single use location
+  Skipped: 1332
+     1096  reference is not a traits-array entry
+      129  only reference is in JS/JSX code
+       54  trait has morph:true acceptPrps
+       44  trait entry has a runtime condition
+        3  not first in traits array: a preceding trait entry has a dynamic path
+        2  only reference is dynamic
+        2  theme/config file involved
+        1  trait has conditional nested traits
+        1  not first in traits array: preceding trait "./functional/closePanelOnEscKey" cannot be analyzed
+
+  Report: D:\development\intenda\codex projects\legoz-workspace\tools\opus-ui-app-cleaner\output\merge-report.json
+
+======== [pass 3] [srcactions] Convert declarative scripts to srcActions ========
+
+================ Script conversion (APPLIED) ================
+
+  Scripts converted: 0 (0 JS files)
+  Actions: 0 native, 0 delegated to runScript (0% native)
+  morph() fallback expressions: 0
+  Script lines: 0 declarative before, 0 generated JS after
+  Skipped scripts: 928
+  Generated-JS syntax errors: 0
+  Workspace size (ensemble .json+.js): 9,568,281 chars before, 9,568,281 after (saved 0 = 0.0%)
+
+  Report: D:\development\intenda\codex projects\legoz-workspace\tools\opus-ui-app-cleaner\output\convert-report.json
+
+======== [pass 3] [check] Verify no new reference issues ========
+check-refs: 22 issue(s) total, 21 baselined, 0 NEW
+OK
+
+======== [pass 3] [redundant] Report: prps equal to component defaults ========
+
+================ Redundant prps (REPORT ONLY) ================
+
+  Component types with literal defaults: 29 (34 props.js parsed, 15 skipped, 29 theme overrides)
+  Prps set to the type's existing default: 37 in 26 files
+
+    l2_dashboards/home/pieChart/index.json
+        pieChart.showTooltip = true (already the default)
+    l2_dashboards/home/pieChart/index.json
+        pieChart.cutout = 0 (already the default)
+    l2_dashboards/home/pieChart/index.json
+        pieChart.tooltipFontColor = "#222" (already the default)
+    l2_dashboards/home/publicationStatusGrid/firstCell.json
+        label.userSelect = "text" (already the default)
+    l2_dashboards/l2_canvas_shared/canvas/tabManager/tabContents/canvasPedigree/pedigreeToolbar/inputSearchPedigree/index.json
+        input.colorPlaceholder = "secondaryText" (already the default)
+    l2_dashboards/l2_data_sources/testResultPanel/container/resultDetailContainer.json
+        label.userSelect = "text" (already the default)
+    l2_dashboards/l2_entities/entitiesGrid/dataSourceHeaderCell/index.json
+        label.userSelect = "text" (already the default)
+    l2_dashboards/l2_object_builder/panels/moreInfoPanel/sharedGrids/dataSourceQuery/index.json
+        label.userSelect = "text" (already the default)
+    l2_dashboards/l2_object_builder/panels/moreInfoPanel/sharedGrids/dataSourceQuery/index.json
+        label.userSelect = "text" (already the default)
+    l2_dashboards/l2_object_builder/panels/shared/cacheStatusCell/index.json
+        label.userSelect = "text" (already the default)
+    l2_dashboards/l2_object_builder/panels/shared/cacheStatusCell/index.json
+        label.userSelect = "text" (already the default)
+    l2_dashboards/l2_object_builder/panels/shared/cacheStatusCell/index.json
+        label.userSelect = "text" (already the default)
+    l2_dashboards/reskin/pageCachedObjects/errorPanel/container.json
+        label.userSelect = "text" (already the default)
+    l2_dashboards/reskin/pageCompareDOs/sharedGrids/dataSourceQuery/index.json
+        label.userSelect = "text" (already the default)
+    l2_dashboards/reskin/pageCompareDOs/sharedGrids/dataSourceQuery/index.json
+        label.userSelect = "text" (already the default)
+    l2_dashboards/reskin/pageCompareDOs/sharedGrids/dataSourceQuery/index.json
+        label.userSelect = "text" (already the default)
+    l2_dashboards/reskin/pageDataObject/DOAnnotations/sourceGridHeaderCell.json
+        label.userSelect = "text" (already the default)
+    l2_dashboards/reskin/pageDataObject/DOConfig/index.json
+        upload.canSelectMultiple = false (already the default)
+    l2_dashboards/reskin/pageDataObject/DODistributionSchedule/panelError/container.json
+        label.userSelect = "text" (already the default)
+    l2_dashboards/reskin/pageDataObject/DOFields/sourceGrid/sourceGridHeaderCell.json
+        label.userSelect = "text" (already the default)
+    ... and 17 more (--print for all)
+
+  Report only — a prp equal to today's default still pins the value; review before removing.
+
+  Report: D:\development\intenda\codex projects\legoz-workspace\tools\opus-ui-app-cleaner\output\redundant-prps.json
+
+
+======== [pass 3] [themekeys] Report: theme keys nothing references ========
+
+================ Unused theme keys (REPORT ONLY) ================
+
+  theme.actions  (2 of 31 keys unused)
+      cdm   (legoz/app/theme/actions.json)
+      roleTypes   (legoz/app/theme/actions.json)
+
+  theme.colors  (14 of 43 keys unused)
+      darkModePrimary   (l2_grid/theme/colors.json)
+      iconSecondary   (l2_grid/theme/colors.json)
+      superLightGrey   (l2_grid/theme/colors.json)
+      babyBlue   (l2_grid/theme/colors.json)
+      khaki   (l2_grid/theme/colors.json)
+      paleMint   (l2_grid/theme/colors.json)
+      fluorescentBlue   (l2_grid/theme/colors.json)
+      scrollbarTrack   (l2_grid/theme/colors.json)
+      scrollbarThumb   (l2_grid/theme/colors.json)
+      darkModePrimaryLighter   (legoz/app/theme/colors.json)
+      darkModePrimaryDarker   (legoz/app/theme/colors.json)
+      lightSecondaryDarker   (legoz/app/theme/colors.json)
+      infoDarker   (legoz/app/theme/colors.json)
+      iceBlueLighter   (legoz/app/theme/colors.json)
+
+  theme.colorsDark  (5 of 5 keys unused)
+      loaderIcon   (legoz/app/theme/colorsDark.json)
+      loaderBackground   (legoz/app/theme/colorsDark.json)
+      loaderBackgroundOpacity   (legoz/app/theme/colorsDark.json)
+      scrollbarTrack   (legoz/app/theme/colorsDark.json)
+      scrollbarThumb   (legoz/app/theme/colorsDark.json)
+
+  theme.colorsLight  (3 of 3 keys unused)
+      loaderIcon   (legoz/app/theme/colorsLight.json)
+      loaderBackground   (legoz/app/theme/colorsLight.json)
+      loaderBackgroundOpacity   (legoz/app/theme/colorsLight.json)
+
+  theme.components  (73 of 73 keys unused)
+      audioPlayer   (l2_grid/theme/components.json)
+      audioRecorder   (l2_grid/theme/components.json)
+      badge   (l2_grid/theme/components.json)
+      bladeManager   (l2_grid/theme/components.json)
+      bpm   (l2_grid/theme/components.json)
+      button   (l2_grid/theme/components.json)
+      calculationBuilder   (l2_grid/theme/components.json)
+      calendar   (l2_grid/theme/components.json)
+      camera   (l2_grid/theme/components.json)
+      canvas   (l2_grid/theme/components.json)
+      checkbox   (l2_grid/theme/components.json)
+      codeEditor   (l2_grid/theme/components.json)
+      container   (l2_grid/theme/components.json)
+      containerDnd   (l2_grid/theme/components.json)
+      containerMovable   (l2_grid/theme/components.json)
+      ... and 58 more (--print for all)
+
+  theme.componentsLight  (2 of 2 keys unused)
+      scrollbarTrack   (legoz/app/theme/componentsLight.json)
+      scrollbarThumb   (legoz/app/theme/componentsLight.json)
+
+  theme.functions  (2 of 2 keys unused)
+      getMessage   (legoz/app/theme/functions.json)
+      getEventParametersWithDynamicKeys   (legoz/app/theme/functions.json)
+
+  theme.global  (24 of 32 keys unused)
+      noPadding   (l2_grid/theme/global.json)
+      tinySmallPadding   (l2_grid/theme/global.json)
+      smallMediumPadding   (l2_grid/theme/global.json)
+      giantPadding   (l2_grid/theme/global.json)
+      borderRadius   (l2_grid/theme/global.json)
+      borderRadiusBig   (l2_grid/theme/global.json)
+      borderRadiusGiant   (l2_grid/theme/global.json)
+      fontSizeSmallest   (l2_grid/theme/global.json)
+      fontSizeSmaller   (l2_grid/theme/global.json)
+      fontSizeSmall   (l2_grid/theme/global.json)
+      fontSizeBig   (l2_grid/theme/global.json)
+      fontSizeBigger   (l2_grid/theme/global.json)
+      fontSizeBiggest   (l2_grid/theme/global.json)
+      fontFamily   (l2_grid/theme/global.json)
+      fontWeight   (l2_grid/theme/global.json)
+      ... and 9 more (--print for all)
+
+  theme.l2_buttons_colors  (13 of 26 keys unused)
+      text/textHoverOn   (l2_buttons/theme/l2_buttons_colors.json)
+      warning/textHoverOn   (l2_buttons/theme/l2_buttons_colors.json)
+      warning/textHoverOff   (l2_buttons/theme/l2_buttons_colors.json)
+      warning/iconHoverOn   (l2_buttons/theme/l2_buttons_colors.json)
+      warning/iconHoverOff   (l2_buttons/theme/l2_buttons_colors.json)
+      dynamic/cptHoverOn   (l2_buttons/theme/l2_buttons_colors.json)
+      dynamic/cptHoverOff   (l2_buttons/theme/l2_buttons_colors.json)
+      dynamic/iconHoverOn   (l2_buttons/theme/l2_buttons_colors.json)
+      dynamic/iconHoverOff   (l2_buttons/theme/l2_buttons_colors.json)
+      dynamic/borderHoverOn   (l2_buttons/theme/l2_buttons_colors.json)
+      dynamic/borderHoverOff   (l2_buttons/theme/l2_buttons_colors.json)
+      dynamic/bgHoverOn   (l2_buttons/theme/l2_buttons_colors.json)
+      dynamic/bgHoverOff   (l2_buttons/theme/l2_buttons_colors.json)
+
+  theme.l2_canvas_shared_functions  (2 of 2 keys unused)
+      buildDataObjectWorkspaceHeaders   (l2_dashboards/theme/l2_canvas_shared_functions.json)
+      buildExpandedWorkspaceHeaders   (l2_dashboards/theme/l2_canvas_shared_functions.json)
+
+  theme.l2_data_connectors_components  (1 of 1 keys unused)
+      markdownLabel   (l2_dashboards/theme/l2_data_connectors_components.json)
+
+  theme.l2_data_connectors_free_text  (1 of 1 keys unused)
+      userGuide   (l2_dashboards/theme/l2_data_connectors_free_text.json)
+
+  theme.l2_grid_functions  (2 of 2 keys unused)
+      buildWhereClause   (l2_grid/theme/l2_grid_functions.json)
+      doRecordsDiffer   (l2_grid/theme/l2_grid_functions.json)
+
+  theme.l2_menu_tree_colors  (9 of 23 keys unused)
+      menuItemIconActive   (l2_menu_tree/theme/l2_menu_tree_colors.json)
+      menuItemLabelActive   (l2_menu_tree/theme/l2_menu_tree_colors.json)
+      menuItemActiveBackground   (l2_menu_tree/theme/l2_menu_tree_colors.json)
+      menuItemHoverBackground   (l2_menu_tree/theme/l2_menu_tree_colors.json)
+      menuSectionExpandedBackground   (l2_menu_tree/theme/l2_menu_tree_colors.json)
+      menuSectionExpandedBackgroundAlpha   (l2_menu_tree/theme/l2_menu_tree_colors.json)
+      menuSectionExpandedBackgroundLevel2   (l2_menu_tree/theme/l2_menu_tree_colors.json)
+      iconItem   (l2_menu_tree/theme/l2_menu_tree_colors.json)
+      menuSectionExpandedBackgroundAlphaLevel2   (legoz/app/theme/l2_menu_tree_colors.json)
+
+  theme.l2_menu_tree_sizing  (3 of 15 keys unused)
+      prpsLogoExpanded   (l2_menu_tree/theme/l2_menu_tree_sizing.json)
+      prpsLogoCollapsed   (l2_menu_tree/theme/l2_menu_tree_sizing.json)
+      menuCollapseWidthBasedOnMaxDepth   (l2_menu_tree/theme/l2_menu_tree_sizing.json)
+
+  theme.l2_object_builder_functions  (3 of 3 keys unused)
+      setNewDOStateFromDataObjectConfigPanel   (l2_dashboards/theme/l2_object_builder_functions.json)
+      buildCalculationWgtData   (l2_dashboards/theme/l2_object_builder_functions.json)
+      buildInitialWgtBackgroundColor   (l2_dashboards/theme/l2_object_builder_functions.json)
+
+  theme.l2_ontology_functions  (31 of 31 keys unused)
+      manageOntologyBuilderData   (l2_ontology/theme/l2_ontology_functions.json)
+      generateLineageComponents   (l2_ontology/theme/l2_ontology_functions.json)
+      generateLineageData   (l2_ontology/theme/l2_ontology_functions.json)
+      buildMaintainEntityAttributeRows   (l2_ontology/theme/l2_ontology_functions.json)
+      buildTermsFromOntologyData   (l2_ontology/theme/l2_ontology_functions.json)
+      buildSectionData   (l2_ontology/theme/l2_ontology_functions.json)
+      reformatTreeData   (l2_ontology/theme/l2_ontology_functions.json)
+      buildSectionDataLinkScreen   (l2_ontology/theme/l2_ontology_functions.json)
+      urlEncodeBody   (l2_ontology/theme/l2_ontology_functions.json)
+      renderSparkLine   (l2_ontology/theme/l2_ontology_functions.json)
+      amendLinkedObjects   (l2_ontology/theme/l2_ontology_functions.json)
+      buildLinkedObjects   (l2_ontology/theme/l2_ontology_functions.json)
+      formatRuleOutcomeData   (l2_ontology/theme/l2_ontology_functions.json)
+      setOutcomeData   (l2_ontology/theme/l2_ontology_functions.json)
+      filterTermsList   (l2_ontology/theme/l2_ontology_functions.json)
+      ... and 16 more (--print for all)
+
+  theme.l2_ontology_system  (2 of 4 keys unused)
+      apiLocationX   (l2_ontology/theme/l2_ontology_system.json)
+      exceptionTrackerLocationX   (l2_ontology/theme/l2_ontology_system.json)
+
+  theme.l2_shell_functions  (1 of 1 keys unused)
+      getDate   (l2_shell/theme/l2_shell_functions.json)
+
+  theme.l2_shell_global  (1 of 1 keys unused)
+      prpsBackgroundContainer   (l2_shell/theme/l2_shell_global.json)
+
+  theme.l2_shell_images  (1 of 3 keys unused)
+      homeBackground   (l2_shell/theme/l2_shell_images.json)
+
+  theme.l2_shell_system  (1 of 3 keys unused)
+      sidebarDataTrait   (l2_shell/theme/l2_shell_system.json)
+
+  theme.l2_sidebar_colors  (9 of 9 keys unused)
+      background   (legoz/app/theme/l2_sidebar_colors.json)
+      borderRight   (legoz/app/theme/l2_sidebar_colors.json)
+      menuItemIconHoverOff   (legoz/app/theme/l2_sidebar_colors.json)
+      menuItemIconHoverOn   (legoz/app/theme/l2_sidebar_colors.json)
+      menuItemLabelHoverOff   (legoz/app/theme/l2_sidebar_colors.json)
+      menuItemLabelHoverOn   (legoz/app/theme/l2_sidebar_colors.json)
+      menuItemIconActive   (legoz/app/theme/l2_sidebar_colors.json)
+      menuItemLabelActive   (legoz/app/theme/l2_sidebar_colors.json)
+      parentItemBackgroundExpanded   (legoz/app/theme/l2_sidebar_colors.json)
+
+  theme.l2_topbar_colors  (3 of 3 keys unused)
+      pageIcon   (l2_topbar/theme/l2_topbar_colors.json)
+      pageTitle   (l2_topbar/theme/l2_topbar_colors.json)
+      lineUnderTitle   (l2_topbar/theme/l2_topbar_colors.json)
+
+  theme.messages  (6 of 27 keys unused)
+      organisationRoles   (legoz/app/theme/messages.json)
+      roleTypes   (legoz/app/theme/messages.json)
+      cdm   (legoz/app/theme/messages.json)
+      calculationBuilder   (legoz/app/theme/messages.json)
+      filterBuilder   (legoz/app/theme/messages.json)
+      menuTree   (legoz/app/theme/messages.json)
+
+  theme.system  (2 of 11 keys unused)
+      urlEntry   (legoz/app/theme/system.json)
+      canvasLegendImage   (legoz/app/theme/system.json)
+
+  TOTAL: 216 of 364 theme keys have no visible accessor usage
+  Report only — theme accessors can be built dynamically; review before deleting.
+
+  Report: D:\development\intenda\codex projects\legoz-workspace\tools\opus-ui-app-cleaner\output\unused-theme-keys.json
+
+
+Pass 3 changed nothing — converged.
+
+############ Suite summary ############
+
+  Passes: 3 (converged)
+
+  OK    [p1] baseline  (2s)
+  OK    [p1] unused  (1s)
+  OK    [p1] delete  (1s)
+  OK    [p1] acceptprps  (1s)
+  OK    [p1] collapse  (3s)
+  OK    [p1] dedupe  (3s)
+  OK    [p1] traitprps  (1s)
+  OK    [p1] merge  (8s)
+  OK    [p1] srcactions  (71s)
+  OK    [p1] check  (1s)
+  OK    [p1] redundant  (1s)
+  OK    [p1] themekeys  (1s)
+
+  OK    [p2] baseline  (1s)
+  OK    [p2] unused  (1s)
+  OK    [p2] delete  (0s)
+  OK    [p2] acceptprps  (1s)
+  OK    [p2] collapse  (1s)
+  OK    [p2] dedupe  (2s)
+  OK    [p2] traitprps  (1s)
+  OK    [p2] merge  (3s)
+  OK    [p2] srcactions  (2s)
+  OK    [p2] check  (1s)
+  OK    [p2] redundant  (1s)
+  OK    [p2] themekeys  (1s)
+
+  OK    [p3] baseline  (1s)
+  OK    [p3] unused  (1s)
+  OK    [p3] delete  (0s)
+  OK    [p3] acceptprps  (1s)
+  OK    [p3] collapse  (1s)
+  OK    [p3] dedupe  (2s)
+  OK    [p3] traitprps  (1s)
+  OK    [p3] merge  (1s)
+  OK    [p3] srcactions  (1s)
+  OK    [p3] check  (1s)
+  OK    [p3] redundant  (1s)
+  OK    [p3] themekeys  (1s)
+
+  Total: 130s
+
+  Files (.json+.js):  6,288 before, 4,532 after (1,756 fewer)
+  Characters:         14,862,918 before, 9,616,226 after (saved 5,246,692 = 35.3%)
+  Scripts converted:  2,210 declarative scripts became JS files
+  Script lines:       68,512 declarative before, 37,830 generated JS after
+
+  Next steps:
+    1. Run the app and click through the menu dashboards.
+    2. Review the two report-only outputs (redundant-prps.json, unused-theme-keys.json).
+    3. Commit each ensemble (deletion + cleanup can be one commit or per-phase —
+       the per-tool reports in this folder document exactly what changed).
+  (deleted-files/ and *-backup/ dirs stay as the undo record until the NEXT
+   --apply run, which clears them automatically.)
+

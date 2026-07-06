@@ -105,11 +105,13 @@ hardening that shouldn't become a general conversion rule.
 ## Conversion notes
 
 - Scripts that can't be converted safely stay declarative and are listed in
-  `convert-report.json` with a reason (trait-prp wildcards, nested-repeater
-  scoped placeholders, scopedVariable reads, dynamic configs …). Fail-closed:
-  the tool never emits code it can't prove faithful.
-- Repeater `((rowData.x))` placeholders convert via `__rowParams` (the span
-  stays in JSON where the repeater substitutes it per row).
+  `convert-report.json` with a reason (wildcard object keys, $...x$ spreads,
+  nested-repeater scoped placeholders, scopedVariable reads, fn.* accessors …).
+  Fail-closed: the tool never emits code it can't prove faithful.
+- Repeater `((rowData.x))` placeholders convert via `__rowParams` and
+  trait-prp wildcards (`%x%`/`$x$`) via `__traitParams`: the verbatim span
+  stays in JSON where the repeater/trait engine substitutes it, and the JS
+  reads the per-row/per-application value from config.
 - Cross-script `scopedVariable` producers get `setVariable()` engine-store
   syncs emitted automatically.
 - The generated JS relies on interface members added to opus-ui's
