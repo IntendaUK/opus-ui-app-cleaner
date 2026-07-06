@@ -442,17 +442,38 @@ class Codegen {
 				idExpr = id === 'self' ? null : JSON.stringify(id);
 			}
 
-			//Fail closed on residual accessor syntax in the key path too.
-			if (/\(\(|\{\{/.test(src))
-				return this.morphFallback(rawWithDelims, ctx);
-
 			if (!src)
 				return null;
 
-			const [key, ...subs] = src.split('.');
 			const base = idExpr === null
 				? (this.use('getState'), '(getState() ?? {})')
 				: (this.use('getExternalState'), `(getExternalState(${idExpr}) ?? {})`);
+
+			//Dynamic key-path segments ({{state.||grid.dataManager||.fetchedData.
+			// ((state.||entry||.index)).errormessage}}): the engine resolves inner
+			// accessors innermost-first and splices their values into the path
+			// text. Replicate with a template-literal path (same as the variable
+			// branch); a failed inner resolution fails the whole script closed.
+			if (/\(\(|\{\{/.test(src)) {
+				const pathSpans = this.findAccessorSpans(src);
+				if (!pathSpans.length || pathSpans[0].start === 0)
+					return this.morphFallback(rawWithDelims, ctx);
+				const escPath = x => x.replace(/[`\\$]/g, c => '\\' + c);
+				let tpl = '';
+				let pos = 0;
+				for (const sp of pathSpans) {
+					const innerExpr = this.accessorExpr(sp.inner, { ...ctx, drilled: true }, src.slice(sp.start, sp.end));
+					if (innerExpr === null)
+						return this.morphFallback(rawWithDelims, ctx);
+					tpl += escPath(src.slice(pos, sp.start)) + `\${String(${innerExpr})}`;
+					pos = sp.end;
+				}
+				tpl += escPath(src.slice(pos));
+				this.helper('__deep');
+				return `__deep(${base}, \`${tpl}\`)`;
+			}
+
+			const [key, ...subs] = src.split('.');
 			const keyed = JS_IDENT.test(key) ? `${base}.${key}` : `${base}[${JSON.stringify(key)}]`;
 			if (!subs.length)
 				return keyed;
@@ -462,6 +483,19 @@ class Codegen {
 
 		if (type === 'eval')
 			return this.evalExpr(rest, ctx, rawWithDelims);
+
+		//Theme-function accessors ({{fn.getMessage}}): the engine morphs the
+		// PARENT object's fnArgs[<key>] and calls the registered function. The
+		// fnArgs context is threaded per key by valueExpr/actionCfgExpr, with a
+		// value-keyed fallback for generators that build configs manually.
+		if (type === 'fn') {
+			const fnName = rest.split('.')[0] || rest;
+			const argsRaw = ctx.fnArgsRaw !== undefined ? ctx.fnArgsRaw : ctx.fnByValue?.get(rawWithDelims);
+			if (argsRaw === undefined)
+				return this.morphFallback(rawWithDelims, ctx);
+			this.use('fn');
+			return `fn(${JSON.stringify(fnName)}, ${this.valueExpr(argsRaw, { ...ctx, drilled: true, fnArgsRaw: undefined, fnByValue: undefined })})`;
+		}
 
 		return this.morphFallback(rawWithDelims, ctx);
 	}
@@ -754,6 +788,10 @@ class Codegen {
 					// string/primitive children inherit the parent's drilling.
 					childCtx = { ...ctx, drilled: false };
 
+				//{{fn.*}} accessors read the PARENT's fnArgs[<key>] — thread it.
+				if (v.fnArgs && v.fnArgs[key] !== undefined)
+					childCtx = { ...childCtx, fnArgsRaw: v.fnArgs[key] };
+
 				const keyOut = JS_IDENT.test(key) ? key : JSON.stringify(key);
 				return `${keyOut}: ${this.valueExpr(val, childCtx)}`;
 			});
@@ -803,8 +841,12 @@ class Codegen {
 			if (hasWildcard(k))
 				throw new SkipScript(`trait-prp wildcard in config key: ${k}`);
 			const drilled = typeof val === 'string' || caret.includes(k);
+			const childCtx = { ...ctx, drilled };
+			//{{fn.*}} accessors read the ACTION's fnArgs[<key>] — thread it.
+			if (action.fnArgs && action.fnArgs[k] !== undefined)
+				childCtx.fnArgsRaw = action.fnArgs[k];
 			const keyOut = JS_IDENT.test(k) ? k : JSON.stringify(k);
-			parts.push(`${keyOut}: ${this.valueExpr(val, { ...ctx, drilled })}`);
+			parts.push(`${keyOut}: ${this.valueExpr(val, childCtx)}`);
 		}
 		return `{ ${parts.join(', ')} }`;
 	}
@@ -1047,7 +1089,20 @@ class Codegen {
 
 		const lines = [];
 		const pre = [];
-		const actx = { ...ctx, pre };
+
+		//{{fn.*}} args for generators that read action keys directly (the engine
+		// keys fnArgs by the CONFIG KEY; map by the key's VALUE so accessorExpr
+		// can find the args even without key context).
+		let fnByValue = null;
+		if (action.fnArgs && typeof action.fnArgs === 'object') {
+			fnByValue = new Map();
+			for (const [k, fa] of Object.entries(action.fnArgs)) {
+				if (typeof action[k] === 'string')
+					fnByValue.set(action[k], fa);
+			}
+		}
+
+		const actx = fnByValue ? { ...ctx, pre, fnByValue } : { ...ctx, pre };
 
 		let bodyLines;
 		let resultExpr = null;
@@ -1204,6 +1259,36 @@ class Codegen {
 		//---- literal variables
 		if (VARIABLE_SET_TYPES.has(t)) {
 			const target = this.variableTarget(action, ctx);
+
+			//FOREIGN static scope: the declarative action wrote another script's
+			// engine-store entries — replicate through the interface's scoped
+			// setVariable/getVariable (the store is global, keyed <scope>-<name>).
+			if (!target && typeof action.scope === 'string' && !/\{\{|\(\(/.test(action.scope) && !hasWildcard(action.scope)) {
+				const scope = JSON.stringify(action.scope);
+
+				if (t === 'setVariable' && typeof action.name === 'string') {
+					this.use('setVariable');
+					return { bodyLines: [`${indent}setVariable(${JSON.stringify(action.name)}, ${v(action.value)}, ${scope});`], resultExpr: null };
+				}
+				if (t === 'setVariables' && action.variables && typeof action.variables === 'object') {
+					this.use('setVariable');
+					const lines = Object.entries(action.variables).map(([name, val]) =>
+						`${indent}setVariable(${JSON.stringify(name)}, ${v(val)}, ${scope});`);
+					return { bodyLines: lines, resultExpr: null };
+				}
+				if (t === 'deleteVariable' || t === 'deleteVariables') {
+					this.use('setVariable');
+					const names = (t === 'deleteVariable' ? [action.name] : (action.variables ?? [])).filter(n => typeof n === 'string');
+					return { bodyLines: names.map(n => `${indent}setVariable(${JSON.stringify(n)}, undefined, ${scope});`), resultExpr: null };
+				}
+				if (t === 'deleteVariableKey' && typeof action.name === 'string' && action.key !== undefined) {
+					this.use('getVariable');
+					this.helper('__delKey');
+					//Mutates the stored object in place — same reference the store holds.
+					return { bodyLines: [`${indent}__delKey(getVariable(${JSON.stringify(action.name)}, ${scope}), ${v(action.key)});`], resultExpr: null };
+				}
+			}
+
 			if (!target)
 				return { bodyLines: null };
 
