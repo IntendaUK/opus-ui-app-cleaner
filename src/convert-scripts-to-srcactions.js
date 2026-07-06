@@ -205,6 +205,10 @@ const convertScript = (script, kind, file, fallbackBase) => {
 	if (!actions.length)
 		return false;
 
+	//Footprint of the declarative form (tab-indented JSON lines) — reported
+	// against the generated JS line count in the summary.
+	const declarativeLines = JSON.stringify(actions, null, '\t').split('\n').length;
+
 	//Path-bound point fixes (see POINT_FIXES above).
 	const pointFix = POINT_FIXES.find(p =>
 		p.kind === kind && file.relPath.replace(/\\/g, '/').toLowerCase() === p.file.toLowerCase());
@@ -294,7 +298,9 @@ const convertScript = (script, kind, file, fallbackBase) => {
 		delegated: res.stats.delegated,
 		morphFallbacks: res.stats.morphFallbacks,
 		rowParams: res.rowParams ? Object.keys(res.rowParams).length : undefined,
-		pointFix: pointFix?.note
+		pointFix: pointFix?.note,
+		linesBefore: declarativeLines,
+		linesAfter: res.code.split('\n').length
 	});
 
 	return true;
@@ -425,6 +431,9 @@ console.log(`\n================ Script conversion (${APPLY ? 'APPLIED' : 'DRY-RU
 console.log(`  Scripts converted: ${converted.length} (${generatedFiles} JS files)`);
 console.log(`  Actions: ${totNative} native, ${totDelegated} delegated to runScript (${totNative + totDelegated ? Math.round(totNative / (totNative + totDelegated) * 100) : 0}% native)`);
 console.log(`  morph() fallback expressions: ${totMorph}`);
+const totLinesBefore = converted.reduce((n, c) => n + (c.linesBefore ?? 0), 0);
+const totLinesAfter = converted.reduce((n, c) => n + (c.linesAfter ?? 0), 0);
+console.log(`  Script lines: ${totLinesBefore.toLocaleString('en-US')} declarative before, ${totLinesAfter.toLocaleString('en-US')} generated JS after`);
 console.log(`  Skipped scripts: ${skipped.length}`);
 console.log(`  Generated-JS syntax errors: ${syntaxErrors}${syntaxErrors ? '  <-- MUST BE FIXED' : ''}`);
 
@@ -449,6 +458,10 @@ fs.writeFileSync(reportPath, JSON.stringify({
 		morphFallbacks: totMorph,
 		skipped: skipped.length,
 		syntaxErrors,
+		scriptLines: {
+			before: totLinesBefore,
+			after: totLinesAfter
+		},
 		workspaceChars: {
 			before: charsBefore,
 			after: charsAfter,

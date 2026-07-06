@@ -185,8 +185,9 @@ const steps = [
 const APP_ROOT = resolveAppDir(args);
 //Every registered ensemble + the app's app/ folder — the cleanup's whole world.
 const CLEANUP_ROOTS = [...readEnsembles(APP_ROOT).map(e => e.root), path.join(APP_ROOT, 'app')];
-const measureWorkspaceChars = () => {
+const measureWorkspace = () => {
 	let chars = 0;
+	let files = 0;
 	const walk = dir => {
 		let entries;
 		try {
@@ -200,12 +201,14 @@ const measureWorkspaceChars = () => {
 			const p = path.join(dir, e.name);
 			if (e.isDirectory())
 				walk(p);
-			else if (/\.(json|js)$/.test(e.name))
+			else if (/\.(json|js)$/.test(e.name)) {
 				chars += fs.statSync(p).size;
+				files++;
+			}
 		}
 	};
 	CLEANUP_ROOTS.forEach(walk);
-	return chars;
+	return { chars, files };
 };
 
 //---------------------------------------------------------------- self-clean
@@ -257,7 +260,24 @@ if (APPLY) {
 	console.log('Mutating the workspace. Revert = git reset --hard in every ensemble + legoz.\n');
 }
 
-const charsBefore = measureWorkspaceChars();
+const before = measureWorkspace();
+
+//Cumulative conversion totals — convert-report.json is overwritten per pass,
+// so the suite sums it after each pass.
+const conversionTotals = { scripts: 0, linesBefore: 0, linesAfter: 0 };
+const accumulateConversionTotals = () => {
+	const reportPath = path.join(OUTPUT_DIR, 'convert-report.json');
+	if (!fs.existsSync(reportPath))
+		return;
+	try {
+		const r = JSON.parse(fs.readFileSync(reportPath, 'utf-8'));
+		conversionTotals.scripts += r.stats?.scripts ?? 0;
+		conversionTotals.linesBefore += r.stats?.scriptLines?.before ?? 0;
+		conversionTotals.linesAfter += r.stats?.scriptLines?.after ?? 0;
+	} catch {
+		//Report unreadable — totals stay partial.
+	}
+};
 
 const MAX_PASSES = Math.max(1, Number(args.maxPasses ?? 6));
 let failed = false;
@@ -303,6 +323,8 @@ for (let pass = 1; pass <= (APPLY ? MAX_PASSES : 1) && !failed; pass++) {
 		}
 	}
 
+	accumulateConversionTotals();
+
 	if (!failed && APPLY && workspaceHash() === hashBefore) {
 		converged = true;
 		console.log(`\nPass ${pass} changed nothing — converged.`);
@@ -329,10 +351,14 @@ for (const r of results) {
 
 console.log(`\n  Total: ${Math.round((Date.now() - startedAt) / 1000)}s`);
 
-const charsAfter = measureWorkspaceChars();
-const charsSaved = charsBefore - charsAfter;
-const savedPct = charsBefore ? (charsSaved / charsBefore * 100).toFixed(1) : '0.0';
-console.log(`\n  Workspace size (ensembles + app, .json+.js): ${charsBefore.toLocaleString('en-US')} chars before, ${charsAfter.toLocaleString('en-US')} after (${charsSaved >= 0 ? 'saved' : 'grew'} ${Math.abs(charsSaved).toLocaleString('en-US')} = ${Math.abs(Number(savedPct))}%)`);
+const after = measureWorkspace();
+const charsSaved = before.chars - after.chars;
+const savedPct = before.chars ? (charsSaved / before.chars * 100).toFixed(1) : '0.0';
+console.log('');
+console.log(`  Files (.json+.js):  ${before.files.toLocaleString('en-US')} before, ${after.files.toLocaleString('en-US')} after (${(before.files - after.files).toLocaleString('en-US')} fewer)`);
+console.log(`  Characters:         ${before.chars.toLocaleString('en-US')} before, ${after.chars.toLocaleString('en-US')} after (${charsSaved >= 0 ? 'saved' : 'grew'} ${Math.abs(charsSaved).toLocaleString('en-US')} = ${Math.abs(Number(savedPct))}%)`);
+console.log(`  Scripts converted:  ${conversionTotals.scripts.toLocaleString('en-US')} declarative scripts became JS files`);
+console.log(`  Script lines:       ${conversionTotals.linesBefore.toLocaleString('en-US')} declarative before, ${conversionTotals.linesAfter.toLocaleString('en-US')} generated JS after`);
 
 if (APPLY) {
 	console.log(`
