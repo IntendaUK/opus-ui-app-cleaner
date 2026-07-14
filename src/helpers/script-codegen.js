@@ -855,6 +855,18 @@ class Codegen {
 		cfg = this.normalizeCaretKeys(cfg);
 		const { operator, comparisons } = cfg;
 
+		//A trait-prp wildcard (%x%/$x$) as a comparison operand can't be faithfully
+		// converted: __traitParams keeps the raw token when the prp is undefined
+		// (engine morph semantics), and a raw token string is truthy / never equal —
+		// so isTruthy/isFalsy/isEqual guards flip vs the declarative runtime, firing
+		// branches that should be skipped (e.g. opening "%data.openDashboard%"). Fail
+		// closed: keep the whole script declarative.
+		for (const operandKey of ['value', 'compareValue', 'source', 'key']) {
+			const v = cfg[operandKey];
+			if (typeof v === 'string' && hasWildcard(v))
+				throw new SkipScript(`trait-prp wildcard in comparison ${operandKey} (${v}) — truthiness/equality not faithfully convertible`);
+		}
+
 		if (['all', 'some', 'none'].includes(operator)) {
 			if (!Array.isArray(comparisons))
 				return null;

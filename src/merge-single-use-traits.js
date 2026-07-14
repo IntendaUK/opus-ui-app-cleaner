@@ -692,6 +692,45 @@ const orderConflict = (precedingEntries, targetContrib, hostNode, hostAbsPath, h
 	return { conflict: null, warnings };
 };
 
+//A wildcard whose root prp is bound to a runtime placeholder ({{…}}/((…))) and is
+// DEEP-accessed (%prp.path%/$prp.path$, i.e. with a dot) can't resolve when inlined.
+// Live, the repeater/state engine substitutes the placeholder into a real value
+// BEFORE the trait is applied per row, so the deep access then resolves; inlined,
+// the trait is gone and the engine only substitutes {{}}/(()) accessors. Depending
+// on the shape the wildcard is either frozen as dead "%…%" text (embedded — e.g. a
+// label cpt showing "%rowData.parent.cns_hed_cde%") or DELETED outright (whole-value
+// — deletePrpIfMissing drops the key, e.g. "cpt": "%rowData.heading%" vanishes and
+// the label goes blank). Both are wrong once inlined, so this is scanned on the RAW
+// body BEFORE substitution (the delete case leaves no residue to find afterwards).
+// Fail closed: keep the trait live (skip the merge).
+const hasPlaceholderDeepAccess = (node, prps) => {
+	const rootIsPlaceholderBound = token => {
+		const root = token.split('.')[0];
+		const bound = prps[root];
+		return typeof bound === 'string' && /\{\{|\(\(/.test(bound);
+	};
+	const scanStr = s => {
+		const re = /%([A-Za-z_][\w.]*)%|\$([A-Za-z_][\w.]*)\$/g;
+		let m;
+		while ((m = re.exec(s)) !== null) {
+			const token = m[1] ?? m[2];
+			if (token.includes('.') && rootIsPlaceholderBound(token))
+				return true;
+		}
+		return false;
+	};
+	const walk = v => {
+		if (typeof v === 'string')
+			return scanStr(v);
+		if (Array.isArray(v))
+			return v.some(walk);
+		if (v !== null && typeof v === 'object')
+			return Object.keys(v).some(scanStr) || Object.values(v).some(walk);
+		return false;
+	};
+	return walk(node);
+};
+
 //---------------------------------------------------------------- prepare + apply
 /*
 	prepareTrait: the static equivalent of applyTraitProps (traitManager.js) — loads
@@ -735,6 +774,12 @@ const prepareBody = (trait, entryObj, baseDir, ensemble, warnings, hostSpec) => 
 	const missingRequired = missing.length ? missing : null;
 
 	if (!missingRequired && !hasMorph) {
+		//Fail closed on placeholder-bound deep wildcards (see hasPlaceholderDeepAccess):
+		// checked on the RAW body, since the whole-value shape gets DELETED by the
+		// substitution below and would leave nothing to detect afterwards.
+		if (hasPlaceholderDeepAccess(trait, traitPrps))
+			return { unparseable: true, reason: 'trait-prp bound to a runtime placeholder ({{…}}/((…))) is deep-accessed via %prp.path% — inlining would freeze or drop the wildcard' };
+
 		recursivelyApplyValuePrps(trait, traitPrps, recurseConfig);
 		recursivelyApplyKeyPrps(trait, traitPrps, recurseConfig);
 	}
