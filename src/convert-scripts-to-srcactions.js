@@ -31,7 +31,7 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 const { createScanner } = require('./helpers/scan-core');
 const { resolveAppDir } = require('./helpers/app-config');
-const { generateScript } = require('./helpers/script-codegen');
+const { generateScript, buildHelperModule } = require('./helpers/script-codegen');
 const { loadDoc, saveDoc, parseArgs } = require('./helpers/json-doc');
 
 //Run artifacts (reports, backups, trash) live at the tool root, above src/.
@@ -387,6 +387,19 @@ if (APPLY) {
 				fs.mkdirSync(path.dirname(helperDest), { recursive: true });
 				fs.writeFileSync(helperDest, srcContent);
 				console.log('Deposited network helper: l2_util/scriptHelpers/net.js');
+			}
+
+			//Generated actions import their runtime helpers (__isFalsy, __deep,
+			// __tryEval, …) from a shared module instead of inlining a copy in every
+			// file. Deposited from HELPERS (buildHelperModule) so it can't drift and
+			// survives git clean / resets between runs.
+			const codegenDest = path.join(utilEnsemble.root, 'scriptHelpers', 'codegen.js');
+			const codegenContent = buildHelperModule();
+			const currentCodegen = fs.existsSync(codegenDest) ? fs.readFileSync(codegenDest, 'utf-8') : null;
+			if (currentCodegen !== codegenContent) {
+				fs.mkdirSync(path.dirname(codegenDest), { recursive: true });
+				fs.writeFileSync(codegenDest, codegenContent);
+				console.log('Deposited codegen helpers: l2_util/scriptHelpers/codegen.js');
 			}
 		} else
 			console.warn('No l2_util ensemble registered — network-action scripts import @l2_util/scriptHelpers/net and need one.');

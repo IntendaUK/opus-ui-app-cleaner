@@ -133,6 +133,47 @@ for (const v of entryValues) {
 		missingEntrypoints.push(v);
 }
 
+//5. Ensemble-declared keep paths. An ensemble is itself a standalone Opus UI app
+//   (its own vite build copies folders like samples/ or data/ into dist/), so it
+//   ships files the LEGOZ app never references — the reachability walk above would
+//   flag those as unused and the delete step would remove them, breaking the
+//   ensemble's build/publish. Each ensemble declares the paths its own build needs
+//   in package.json:  { "opusUiAppCleaner": { "keep": ["samples", "data", ...] } }
+//   Entries are ensemble-root-relative path prefixes (a folder keeps everything
+//   under it). We seed them as roots so neither they nor their descendants are ever
+//   reported unused.
+for (const e of ensembles) {
+	let keep = null;
+	try {
+		const pkg = JSON.parse(fs.readFileSync(path.join(e.root, 'package.json'), 'utf8'));
+		if (pkg.opusUiAppCleaner && Array.isArray(pkg.opusUiAppCleaner.keep))
+			keep = pkg.opusUiAppCleaner.keep;
+	} catch { /* no or unreadable package.json — nothing to keep */ }
+	if (!keep || !keep.length)
+		continue;
+
+	const prefixes = keep
+		.map(k => String(k).replace(/\\/g, '/').replace(/^\.?\/+/, '').replace(/\/+$/, ''))
+		.filter(Boolean);
+	if (!prefixes.length)
+		continue;
+
+	let kept = 0;
+	for (const f of files.values()) {
+		if (f.ensemble !== e.name)
+			continue;
+		//relPath is "<ensembleName>/inner/path" — strip the ensemble segment to match.
+		const inner = f.relPath.replace(/\\/g, '/').slice(e.name.length + 1);
+		const hit = prefixes.find(p => inner === p || inner.startsWith(p + '/'));
+		if (hit) {
+			markUsed(f.path, ROOT, `kept (package.json opusUiAppCleaner.keep: "${hit}")`);
+			kept++;
+		}
+	}
+	if (kept)
+		console.log(`  keep-list: ${e.name} preserved ${kept} file(s) under [${prefixes.join(', ')}]`);
+}
+
 //---------------------------------------------------------------- BFS
 const bfsSinkFor = referrerKey => (p, via) => markUsed(p, files.get(referrerKey)?.path ?? ROOT, via);
 
